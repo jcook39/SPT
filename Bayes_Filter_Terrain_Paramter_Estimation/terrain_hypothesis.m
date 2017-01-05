@@ -76,7 +76,7 @@ structRBE.terrainProbability(:,1) = 1/nHypotheses;
 structRBE.nHypotheses = nHypotheses;
 
 structRBE.covarianceMatrix = diag(covariance);
-structRBE.lowProbThreshold = 1E-3;
+%structRBE.lowProbThreshold = 1E-3;
 
 structRBE.peakTractionMatHypotheses = peakTractionMatHypotheses;
 

@@ -70,13 +70,24 @@ structRBE.terrainHypDefn = 1;
 structRBE.terrainHypDefkeq = 100:100:500;
 structRBE.terrainHypDefK = 0.5:1:3.5;
 structRBE.terrainHypDefS = 0.6/33;
-structRBE.covariance = [5e8 5e8];
-structRBE_One = structRBE;
-structRBE_One = terrain_hypothesis(structRBE_One, nConstantMT865, nTimeStep);
+structRBE_1 = structRBE;
+structRBE_1.covariance = [5e8 5e8];
+structRBE_1.normalizeString = 'noNormalize';
+structRBE_1.lowProbThreshold = 1e-3;
+structRBE_1 = terrain_hypothesis(structRBE_1, nConstantMT865, nTimeStep);
 
-structRBE_Two = structRBE;
-structRBE_Two.covariance = [2e-3 2e-3];
-structRBE_Two = terrain_hypothesis(structRBE_Two, nConstantMT865,nTimeStep);
+structRBE_2 = structRBE;
+structRBE_2.covariance = [2e-3 2e-3];
+structRBE_2.normalizeString = 'normalize';
+structRBE_2.lowProbThreshold = 1e-3;
+structRBE_2 = terrain_hypothesis(structRBE_2, nConstantMT865, nTimeStep);
+
+structRBE_3 = structRBE;
+structRBE_3.terrainHypDefK = 0.5:1:7.5;
+structRBE_3.covariance = structRBE_2.covariance;
+structRBE_3.normalizeString = 'normalize';
+structRBE_3.lowProbThreshold = 1e-4;
+structRBE_3 = terrain_hypothesis(structRBE_3, nConstantMT865,nTimeStep);
 
 % Traction Controller
 structTractionController = initialize_TractionController( 0.16, 0.075, nConstantMT865, nTimeStep);
@@ -97,10 +108,11 @@ for timeStepNo = 2:nTimeStep
    %structDTKF_One = propogate_DTKF(structDTKF_One, tractor1(timeStepNo), nConstantMT865, inputMat1(timeStepNo-1,:).', timeStepNo, 'Konline');
    structDTKF_Two = propogate_DTKF(structDTKF_Two, tractor1(timeStepNo), nConstantMT865, inputMat1(timeStepNo-1,:).', timeStepNo, 'Koffline');
    
-   structRBE_One = bayes_estimation(structRBE_One, structDTKF_Two, nConstantMT865, time, timeStepNo, 'NoNormalize');
-   structRBE_Two = bayes_estimation(structRBE_Two, structDTKF_Two, nConstantMT865, time, timeStepNo, 'normalize');
+   structRBE_1 = bayes_estimation(structRBE_1, structDTKF_Two, nConstantMT865, time, timeStepNo);
+   structRBE_2 = bayes_estimation(structRBE_2, structDTKF_Two, nConstantMT865, time, timeStepNo);
+   structRBE_3 = bayes_estimation(structRBE_3, structDTKF_Two, nConstantMT865, time, timeStepNo);
    
-   [ structTractionController, inputMat1(timeStepNo,:) ] = traction_control( structTractionController, structRBE_Two, structDTKF_Two, tractor1(timeStepNo), inputMat1(timeStepNo,:), nConstantMT865, timeStepNo, timeStepS );
+   [ structTractionController, inputMat1(timeStepNo,:) ] = traction_control( structTractionController, structRBE_2, structDTKF_Two, tractor1(timeStepNo), inputMat1(timeStepNo,:), nConstantMT865, timeStepNo, timeStepS );
  
     fprintf('Simulation Time: %f seconds \n',(timeStepNo-1)*timeStepS)       
 end
@@ -109,13 +121,14 @@ end
 plot_result(tractor1,inputMat1,'k',nConstantMT865,nConstantTerrain,nTimeStep,timeStepS,1)
 
 %plot_DTKF_result(structDTKF_One, structRBE_One, nConstantTerrain, nConstantMT865, nTimeStep, timeStepS, 300);
-plot_DTKF_result(structDTKF_Two, structRBE_One, nConstantTerrain, nConstantMT865, nTimeStep, timeStepS, 305);
+plot_DTKF_result(structDTKF_Two, structRBE_1, nConstantTerrain, nConstantMT865, nTimeStep, timeStepS, 305);
 
 %plot_terrain_hypothesis_2(structRBE_One, structDTKF, nConstantMT865, nConstantTerrain, time, 'Hypotheses', 504)
-plot_terrain_hypothesis_2(structRBE_One, structDTKF_Two, nConstantMT865, nConstantTerrain, time, 'Actual', 502)
-plot_terrain_hypothesis_2(structRBE_One, structDTKF_Two, nConstantMT865, nConstantTerrain, time, 'Hypotheses', 520)
+plot_terrain_hypothesis_2(structRBE_1, structDTKF_Two, nConstantMT865, nConstantTerrain, time, 'Actual', 502)
+plot_terrain_hypothesis_2(structRBE_1, structDTKF_Two, nConstantMT865, nConstantTerrain, time, 'Hypotheses', 520)
 
-plot_bayes_estimation(tractor1, structRBE_One, nConstantMT865, time, 505)
-plot_bayes_estimation(tractor1, structRBE_Two, nConstantMT865, time, 600)
+plot_bayes_estimation(tractor1, structRBE_1, nConstantMT865, time, 505)
+%plot_bayes_estimation(tractor1, structRBE_2, nConstantMT865, time, 600)
+plot_bayes_estimation(tractor1, structRBE_3, nConstantMT865, time, 605)
 
 plot_traction_control( tractor1, nConstantMT865, structTractionController, structDTKF_Two, inputMat1, nTimeStep, timeStepS, 800 )

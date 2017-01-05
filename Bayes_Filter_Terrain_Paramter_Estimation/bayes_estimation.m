@@ -1,4 +1,4 @@
-function [ structRBE ] = bayes_estimation(structRBE, structDTKF, nConstantMT865, time, timeStepNo, normalizeString)
+function [ structRBE ] = bayes_estimation(structRBE, structDTKF, nConstantMT865, time, timeStepNo)
 % This function implements a Bayes Estimator where the inputs are the force
 % vector
 
@@ -27,6 +27,8 @@ prior = structRBE.terrainProbability(:,timeStepNo-1);
 nHypotheses = structRBE.nHypotheses;
 covarianceMatrix = structRBE.covarianceMatrix;
 lowProbThreshold = structRBE.lowProbThreshold;
+normalizeString = structRBE.normalizeString;
+
 
 % --------------------------  Bayes Estimator -----------------------------
 
@@ -42,7 +44,7 @@ for k = 1:nHypotheses
         forceVectorHypothesisNormalized = forceVectorHypothesis./forceNormalizationFactor;
         forceVectorDTKFNormalized = forceVectorDTKF./forceNormalizationFactor;
         liklihood(k,1) = mvnpdf(forceVectorDTKFNormalized.', forceVectorHypothesisNormalized.', covarianceMatrix);
-    else
+    elseif strcmp(normalizeString, 'noNormalize')
         liklihood(k,1) = mvnpdf(forceVectorDTKF.', forceVectorHypothesis.', covarianceMatrix);
     end
 end
