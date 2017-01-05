@@ -1,4 +1,7 @@
-function structRBE = terrain_hypothesis(covariance, nConstantMT865, nTimeStep)
+function structRBE = terrain_hypothesis(structRBE, nConstantMT865, nTimeStep)
+
+% --------------- Unpack Ncessary Parameters form structRBE ---------------
+covariance = structRBE.covariance;
 
 % --------------- Unpack Necessary Tractor Parameters ---------------------
 trackWidthM = nConstantMT865.trackWidthM;
@@ -64,7 +67,7 @@ terrainHypotheses = [terrainHypothesisOne terrainHypothesisTwo terrainHypothesis
 
 structRBE.slipVectorBayes = linspace(0.01, 100, 101);
 
-[terrainHypotheses, peakTractionMatHypotheses] = build_terrain_hypotheses(nConstantMT865, structRBE.slipVectorBayes);
+[terrainHypotheses, peakTractionMatHypotheses] = build_terrain_hypotheses(structRBE, nConstantMT865, structRBE.slipVectorBayes);
 nHypotheses = size(terrainHypotheses,2);
 
 structRBE.terrainHypotheses = terrainHypotheses;
@@ -79,32 +82,48 @@ structRBE.peakTractionMatHypotheses = peakTractionMatHypotheses;
 
 end
 
-function [terrainMat, pkTractionMat] = build_terrain_hypotheses(nConstantMT865, slip )
+function [terrainMat, pkTractionMat] = build_terrain_hypotheses(structRBE, nConstantMT865, slip )
 
-c = 1:1:8;
-phi = 20;
-n = 1;
-keq = 100:100:500;
-K = 0.5:1:3.5;
-S = 0.6/33;
+% Unpack hypotheses arrays
+c = structRBE.terrainHypDefCohesion;
+phi = structRBE.terrainHypDefFrictionAngle;
+n = structRBE.terrainHypDefn;
+keq = structRBE.terrainHypDefkeq;
+K = structRBE.terrainHypDefK;
+S = structRBE.terrainHypDefS;
 
+% Compute number of hypotheses and initialize hypotheses matrix
 nCohesion = numel(c);
+nPhi = numel(phi);
+nn = numel(n);
 nkeq = numel(keq);
 nK = numel(K);
-nCombination = nK*nkeq*nCohesion;
+nS = numel(S);
+nCombination = nCohesion*nPhi*nn*nkeq*nK*nS;
 terrainMat = zeros(6,nCombination);
-pkTractionMat = zeros(4,nCombination); % by column = [netTractionNoLoad, peakSlipNoLoad, netTractionLoad, peakSlipLoad].';
 fprintf(' Number of Hypotheses = %f \n', nCombination)
 
+% Initialize peak traction matrix
+pkTractionMat = zeros(4,nCombination); % by column = [netTractionNoLoad, peakSlipNoLoad, netTractionLoad, peakSlipLoad].';
+
+% Fill Terrain Hypotheses Matrix
 terrainMatIndex = 1;
-for i = 1:nCohesion
-   for j = 1:nK
-       for h = 1:nkeq
-           terrainMat(:,terrainMatIndex) = [c(i) phi n keq(h) K(j) S].';
-           [netTractionNoLoad, peakSlipNoLoad, netTractionLoad, peakSlipLoad] ...
-               = peak_traction(nConstantMT865, terrainMat(:,terrainMatIndex), slip, 'MaxTraction');
-           pkTractionMat(:,terrainMatIndex) = [netTractionNoLoad  peakSlipNoLoad  netTractionLoad  peakSlipLoad].'; 
-           terrainMatIndex = terrainMatIndex + 1;
+for h = 1:nCohesion
+   for i = 1:nPhi
+       for j = 1:nn
+           for k = 1:nkeq
+               for m = 1:nK
+                   for p = 1:nS
+           
+terrainMat(:,terrainMatIndex) = [c(h) phi(i) n(j) keq(k) K(m) S(p)].';
+[netTractionNoLoad, peakSlipNoLoad, netTractionLoad, peakSlipLoad] ...
+   = peak_traction(nConstantMT865, terrainMat(:,terrainMatIndex), slip, 'MaxTraction');
+pkTractionMat(:,terrainMatIndex) = [netTractionNoLoad  peakSlipNoLoad  netTractionLoad  peakSlipLoad].'; 
+terrainMatIndex = terrainMatIndex + 1;
+           
+                   end
+               end
+           end
        end
    end
 end
