@@ -13,12 +13,7 @@ omegaHat = estimatedState(2,1);
 forceVectorDTKF = [estimatedState(3,1) estimatedState(5,1)].';
 R_S = estimatedState(7,1);
 
-if (omegaHat <= 0 ), slipHat = 0;
-else slipHat = 1 - (vHat/(omegaHat*rollingRadiusM)); 
-    if slipHat < 0, slipHat = 0; end
-    if slipHat > 1, slipHat = 1; end
-end
-slipHat = slipHat*100 + 1E-10;
+slipHat = calculate_slip(vHat, omegaHat, nConstantMT865);
 
 % ----------------------- Unpack structRBE --------------------------------
 terrainHypotheses = structRBE.terrainHypotheses;
