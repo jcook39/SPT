@@ -133,6 +133,6 @@ structDTKF.smoothedvHat(1,timeStepNo) = smoothedvHat;
 
 % Augmented State / slip estimates
 structDTKF.slipHat(1,timeStepNo) = slipHat;
-structDTKF.slipHatSmooth(1,timeStepno) = slipHatSmooth;
+structDTKF.slipHatSmooth(1,timeStepNo) = slipHatSmooth;
 
 end
