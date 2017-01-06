@@ -9,7 +9,7 @@ function [ structDTKF ] = intialize_DTKF(processNoiseVariance, nConstantMT865, n
 % x = [v omega F_T,Net F_T,NetDot tau_Res tau_ResDot DB DBDot].';
 %
 % -------------------- Measurement Vector ---------------------------------
-% y = [vDot v omega R_S].'
+% y = [vDot v omega DB].'
 %
 % ------- Covariance Matrices for Process and Measurement Noise -----------
 filterTimeStepS = timeStepS;
@@ -88,6 +88,10 @@ structDTKF.Koffline = Koffline;
 structDTKF.smootherAd = smootherAd;
 structDTKF.smootherBd = smootherBd;
 structDTKF.smoothedvHat = zeros(1,nTimeStep);
+
+% Augmented State/slip Estimates
+structDTKF.slipHat = zeros(1,nTimeStep);
+structDTKF.slipHatSmooth = zeros(1,nTimeStep);
 
 
 end
