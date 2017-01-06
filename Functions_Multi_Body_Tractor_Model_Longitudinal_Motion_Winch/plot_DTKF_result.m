@@ -21,6 +21,8 @@ xHatPlus = structDTKF.xHatPlus;
 xError = structDTKF.xError;
 y = structDTKF.y;
 
+smoothedvHat = structDTKF.smoothedvHat;
+
 % ----------------------- Unpack Tractor Parameters -----------------------
 rollingRadiusM = nConstantMT865.rollingRadiusM;
 massTractorKG = nConstantMT865.massTractorKG;
@@ -36,13 +38,16 @@ lineWidthSize = 2;
 trueColor = 'b';
 estimateColor = 'r';
 measureColor = 'k.';
+smoothColor = 'g';
 
 figure(figureNo)
 set(gcf,'numbertitle','off','name','Discrete Time Kalman Filter Results')
 % Speed
 subplot(251)
-    h = plot(timeVector,x(1,indexVector),trueColor,timeVector,xHatPlus(1,indexVector),estimateColor,timeVector,y(2,indexVector),measureColor);
+    h = plot(timeVector,x(1,indexVector),trueColor,timeVector,xHatPlus(1,indexVector),estimateColor,...
+        timeVector,y(2,indexVector),measureColor, timeVector, smoothedvHat, smoothColor);
     set(h(1),'linewidth',lineWidthSize)
+    set(h(4),'linewidth',lineWidthSize)
     ylabel('Vehicle Speed')
     legend('True Value','Estimated Value','Measured Value','Location','SouthEast')
 subplot(256)
@@ -116,8 +121,10 @@ subplot(224)
 fontLabel = 18;    
 figure(figureNo+2)
 subplot(321)
-    h = plot(timeVector,x(1,indexVector),trueColor,timeVector,xHatPlus(1,indexVector),estimateColor,timeVector,y(2,indexVector),measureColor);
+    h = plot(timeVector,x(1,indexVector),trueColor,timeVector,xHatPlus(1,indexVector),estimateColor,...
+        timeVector,y(2,indexVector),measureColor, timeVector, smoothedvHat, smoothColor);
     set(h(1),'linewidth',lineWidthSize)
+    set(h(4),'linewidth',lineWidthSize)
     ylabel('Vehicle Speed, $v_T$ (m/s)','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
     legend('True Value','Estimated Value','Measured Value','Location','NorthEast')
@@ -157,4 +164,6 @@ subplot(326)
     ylabel('Drawbar Load Estimate, $DB$ (N) ','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
     grid on
+    
+    
 end

@@ -1,5 +1,17 @@
 function [structDTKF] = propogate_DTKF(structDTKF ,MT865, nConstantMT865, input, timeStepNo, kalmanGainString)
 
+% ------------------ Kalman Filter Annotation/Definitions -----------------
+%
+% Estimated State Vector:
+% xHat = [vHat omegaHat F_T,NetHat F_T,NetHatDot tau_ResHat tau_ResHatDot 
+%           DBHat DBHatDot].';
+%
+% True State Vector: 
+% x = [v omega F_T,Net F_T,NetDot tau_Res tau_ResDot DB DBDot].';
+%
+% Measurement Vector:
+% y = [vDot v omega R_S].'
+
 % --------------------- Unpack DTKF Structure -----------------------------
 F = structDTKF.F;
 G = structDTKF.G;
@@ -89,10 +101,21 @@ end
 
 xError(:,timeStepNo) = x(:,timeStepNo) - xHatPlus(:,timeStepNo);
 
+% ----------------- Velocity Low Pass Filter ------------------------------
+% Unpack smoother parameters
+smootherAd = structDTKF.smootherAd;
+smootherBd = structDTKF.smootherBd;
+smoothedvHatm1 = structDTKF.smoothedvHat(1,timeStepNo-1);
+
+% Output velocity estimate from DTKF
+vHat = xHatPlus(1,timeStepNo);
+smoothedvHat = smootherAd*smoothedvHatm1 + smootherBd*vHat;
+
 % ----------------- Calculate Estimates of Augmented States ---------------
 
 
 % ------------------ Package DTKF structure -------------------------------
+% DTKF
 structDTKF.x = x;
 structDTKF.xError = xError;
 structDTKF.xHatMinus = xHatMinus;
@@ -101,5 +124,8 @@ structDTKF.PPlus = PPlus;
 structDTKF.PMinus = PMinus;
 structDTKF.K = K;
 structDTKF.y(:,timeStepNo) = y;
+
+% Velocity Filter/Smoother
+structDTKF.smoothedvHat(1,timeStepNo) = smoothedvHat;
 
 end

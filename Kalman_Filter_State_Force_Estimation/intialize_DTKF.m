@@ -3,10 +3,10 @@ function [ structDTKF ] = intialize_DTKF(processNoiseVariance, nConstantMT865, n
 %
 % --------------------- Estimated State Vector ----------------------------
 % xHat = [vHat omegaHat F_T,NetHat F_T,NetHatDot tau_ResHat tau_ResHatDot 
-%           R_SHat R_SHatDot].';
+%           DBHat DBHatDot].';
 %
 % --------------------- True State Vector ----------------------------
-% x = [v omega F_T,Net F_T,NetDot tau_Res tau_ResDot R_S R_SDot].';
+% x = [v omega F_T,Net F_T,NetDot tau_Res tau_ResDot DB DBDot].';
 %
 % -------------------- Measurement Vector ---------------------------------
 % y = [vDot v omega R_S].'
@@ -48,8 +48,17 @@ H = [0  0  1/mT  0  0  0  -1/mT  0;
      
 [F, G] = c2d(A, B, filterTimeStepS);
 
+% -------------- Initialize Velocity Filter/Smoother ----------------------
+% xdot = (1/TC)(-x + u);
+TC = 0.25;
+smootherA = -1/TC;
+smootherB = 1/TC;
+[smootherAd, smootherBd] = c2d(smootherA, smootherB, filterTimeStepS);
+
 
 % ------------------ Package DTKF Structure -------------------------------
+
+% Kalman Filter
 structDTKF.F = F;
 structDTKF.G = G;
 structDTKF.filterTimeStepS = filterTimeStepS;
@@ -75,6 +84,10 @@ structDTKF.engineThrottleSignalNoiseVariance = 1.57e-6;
 load('Koffline.mat')
 structDTKF.Koffline = Koffline;
 
+% Velocity Filter/Smoother
+structDTKF.smootherAd = smootherAd;
+structDTKF.smootherBd = smootherBd;
+structDTKF.smoothedvHat = zeros(1,nTimeStep);
 
 
 end
