@@ -14,7 +14,7 @@ estimatedState = structDTKF.xHatPlus(:,timeStepNo);
     DB = estimatedState(7,1);
     
 slipHat = structDTKF.slipHat(1,timeStepNo);
-slipHatSmooth = structDTKF.slipHatSmoot(1,timeStepNo);
+slipHatSmooth = structDTKF.slipHatSmooth(1,timeStepNo);
 
 % ----------------------- Unpack structRBE --------------------------------
 terrainHypotheses = structRBE.terrainHypotheses;
@@ -32,7 +32,7 @@ liklihood = zeros(nHypotheses,1);
 forceNormalizationFactor = [normalForceN rollingRadiusM*normalForceN].';
 for k = 1:nHypotheses
     % Calculate Force Vectors
-    [F_TNet, ~, ~, tauRes, ~] = net_track_force(terrainHypotheses(:,k), nConstantMT865 , slipHat);
+    [F_TNet, ~, ~, tauRes, ~] = net_track_force(terrainHypotheses(:,k), nConstantMT865 , slipHatSmooth);
     forceVectorHypothesis = [F_TNet tauRes].';
     
     % Compute the liklihood of the hypotheses

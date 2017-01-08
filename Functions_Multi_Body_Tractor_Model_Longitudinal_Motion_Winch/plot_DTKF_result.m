@@ -1,4 +1,4 @@
-function plot_DTKF_result(structDTKF, structRBE, nConstantTerrain, nConstantMT865, nTimeStep, timeStepS, figureNo)
+function plot_DTKF_result(structDTKF, nConstantTerrain, nConstantMT865, nTimeStep, timeStepS, figureNo)
 
 % --------------------- Estimated State Vector ----------------------------
 % xHat = [vHat omegaHat F_T,NetHat F_T,NetHatDot tau_ResHat tau_ResHatDot 
@@ -22,6 +22,8 @@ xError = structDTKF.xError;
 y = structDTKF.y;
 
 smoothedvHat = structDTKF.smoothedvHat;
+slipHat = structDTKF.slipHat;
+slipHatSmooth = structDTKF.slipHatSmooth;
 
 % ----------------------- Unpack Tractor Parameters -----------------------
 rollingRadiusM = nConstantMT865.rollingRadiusM;
@@ -90,13 +92,13 @@ subplot(2,5,10)
 resistanceSledEstimateN = xHatPlus(7,indexVector) - massSledKG*((xHatPlus(3,indexVector) - xHatPlus(7,indexVector))/massTractorKG);     
 resistanceCoefficientEstimate = resistanceSledEstimateN./(massSledKG*gMPS2);
 
-slipVectorEstimate = 100*(1-(xHatPlus(1,indexVector)./(rollingRadiusM*xHatPlus(2,indexVector))));
 slipVectorTrue = 100*(1-(x(1,indexVector)./(rollingRadiusM*x(2,indexVector))));
 slipVectorMeasure = 100*(1-(y(2,indexVector)./(rollingRadiusM*y(3,indexVector))));
 figure(figureNo+1)
 set(gcf,'numbertitle','off','name','Slip-Drawbar Force Estimation')
 subplot(221)
-    plot(timeVector,slipVectorTrue,trueColor,timeVector,slipVectorEstimate,estimateColor,timeVector,slipVectorMeasure,measureColor)
+    plot(timeVector,slipVectorTrue,trueColor,timeVector,slipHat,estimateColor,...
+        timeVector,slipVectorMeasure,measureColor,timeVector,slipHatSmooth,smoothColor)
     set(h(1),'linewidth',lineWidthSize)
     xlabel('time (seconds)')
     ylabel('slip')
@@ -104,7 +106,7 @@ subplot(221)
     legend('True Value','Estimated Value','Measured Value')
     grid on
 subplot(222)
-    plot3(timeVector,slipVectorEstimate,xHatPlus(7,indexVector),estimateColor)
+    plot3(timeVector,slipHat,xHatPlus(7,indexVector),estimateColor)
     zlabel('Estimated Drawbar Force')
     ylabel('Estimated Slip')
     xlabel('time (seconds)')
@@ -137,8 +139,10 @@ subplot(322)
     ylim([0 4])
     grid on
 subplot(323)    
-    h = plot(timeVector,slipVectorTrue,trueColor,timeVector,slipVectorEstimate,estimateColor,timeVector,slipVectorMeasure,measureColor)
+    h = plot(timeVector,slipVectorTrue,trueColor,timeVector,slipHat,estimateColor,...
+        timeVector,slipVectorMeasure,measureColor,timeVector,slipHatSmooth,smoothColor)
     set(h(1),'linewidth',lineWidthSize)
+    set(h(4),'linewidth',lineWidthSize)
     xlabel('time (seconds)')
     ylabel('slip ratio, i (\%)','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)

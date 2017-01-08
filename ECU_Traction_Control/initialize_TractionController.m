@@ -11,13 +11,6 @@ KiGR = KiAll./nGR;
 KpGR(:) = KpAll;
 KiGR(:) = KiAll;
 
-% ------ Low Pass Filter Slip Ref and Estimated Tractor Velocity ----------
-timeConstantVelocityFilter = 0.1;
-num = 1/timeConstantVelocityFilter;
-den = [1 1/timeConstantVelocityFilter];
-tf(num,den);
-
-
 % ----------------- Package controller structure --------------------------
 structTractionController.KpGR = KpGR;
 structTractionController.KiGR = KiGR;
@@ -36,7 +29,7 @@ structTractionController.tractionControlIsOn = zeros(nTimeStep,1);
 structTractionController.gearShiftControlUpdateRateHz = 1;
 structTractionController.gearShiftControlIsOn = zeros(nTimeStep,1);
 structTractionController.gearShiftControlCountInt = zeros(nTimeStep,1);
-structTractionController.gearShiftControlEngineRPMTargetRPM = 1750;
+structTractionController.gearShiftControlEngineRPMTargetRPM = 1800;
 structTractionController.gearNo = zeros(nTimeStep,1);
 
 structTractionController.gearShiftFlag = zeros(nTimeStep,1);

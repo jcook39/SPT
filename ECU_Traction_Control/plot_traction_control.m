@@ -32,14 +32,16 @@ tau_ResHat = xHatPlus(5,:);
 DBHat = xHatPlus(7,:); % notation is also R_S for drawbar pull
 
 % slipHat Calculation
-for i = 1:nTimeStep
-    if (omegaHat(i) <= 0 ), slipHat(i) = 0;
-    else slipHat(i) = 1 - (vHat(i)/(omegaHat(i)*rollingRadiusM)); 
-        if slipHat(i) < 0, slipHat(i) = 0; end
-        if slipHat(i) > 1, slipHat(i) = 1; end
-    end
-slipHat(i) = slipHat(i)*100 + 1E-10;
-end
+slipHat = structDTKF.slipHat;
+slipHatSmooth = structDTKF.slipHatSmooth;
+% for i = 1:nTimeStep
+%     if (omegaHat(i) <= 0 ), slipHat(i) = 0;
+%     else slipHat(i) = 1 - (vHat(i)/(omegaHat(i)*rollingRadiusM)); 
+%         if slipHat(i) < 0, slipHat(i) = 0; end
+%         if slipHat(i) > 1, slipHat(i) = 1; end
+%     end
+% slipHat(i) = slipHat(i)*100 + 1E-10;
+% end
 
 % ------------------ Unpack Controller Structure --------------------------
 errorOmegaIntegrated = structTractionController.errorOmegaIntegrated;
@@ -91,12 +93,14 @@ plot( trackSpeedMat, gearNoMat, omegaHat, usedGearNo, 'k:')
 trueColor = 'b';
 measuredColor = 'k.';
 estimatedColor = 'r';
-refColor = 'g';
+smoothColor = 'g';
+refColor = 'c';
 
 
 figure(figureNo)
 subplot(231)
-    plot(timeVector, iref, refColor, timeVector, slip, trueColor, timeVector, slipHat, estimatedColor)
+    plot(timeVector, iref, refColor, timeVector, slip, trueColor,...
+    timeVector, slipHat, estimatedColor, timeVector, slipHatSmooth, smoothColor)
     legend('slip reference','slip actual','estimated slip')
 subplot(232)
     plot(timeVector, omegaRef, refColor, timeVector, w, trueColor, timeVector, omegaHat, estimatedColor)

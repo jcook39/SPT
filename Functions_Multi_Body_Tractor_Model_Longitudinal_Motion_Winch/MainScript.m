@@ -30,7 +30,7 @@ nConstantTerrain = generate_terrain(nConstantTerrain,nConstantMT865);
 
 %% --------------- Set Simulation Integration Time Steps ------------------
 timeStepS = 0.05;
-simulationTime = 30;
+simulationTime = 40;
 time = [0:timeStepS:simulationTime].'; % Time array based on sample time and total simulation time
 nTimeStep = size(time,1); % Total number of time steps
 
@@ -89,7 +89,7 @@ structRBE_3.lowProbThreshold = 1e-4;
 structRBE_3 = terrain_hypothesis(structRBE_3, nConstantMT865,nTimeStep);
 
 % Traction Controller
-structTractionController = initialize_TractionController( 0.16, 0.075, nConstantMT865, nTimeStep);
+structTractionController = initialize_TractionController( 0.12, 0.05, nConstantMT865, nTimeStep);
 
 %% ------------------------ Initialize Structure --------------------------
 % Tractor 1
@@ -111,7 +111,7 @@ for timeStepNo = 2:nTimeStep
    structRBE_2 = bayes_estimation(structRBE_2, structDTKF_2, nConstantMT865, time, timeStepNo);
    structRBE_3 = bayes_estimation(structRBE_3, structDTKF_2, nConstantMT865, time, timeStepNo);
    
-   [ structTractionController, inputMat1(timeStepNo,:) ] = traction_control( structTractionController, structRBE_2, structDTKF_2, tractor1(timeStepNo), inputMat1(timeStepNo,:), nConstantMT865, timeStepNo, timeStepS );
+   [ structTractionController, inputMat1(timeStepNo,:) ] = traction_control( structTractionController, structRBE_3, structDTKF_2, tractor1(timeStepNo), inputMat1(timeStepNo,:), nConstantMT865, timeStepNo, timeStepS );
  
     fprintf('Simulation Time: %f seconds \n',(timeStepNo-1)*timeStepS)       
 end
@@ -119,14 +119,14 @@ end
 %% ---------------------------- Plot Result -------------------------------
 plot_result(tractor1,inputMat1,'k',nConstantMT865,nConstantTerrain,nTimeStep,timeStepS,1)
 
-%plot_DTKF_result(structDTKF_One, structRBE_One, nConstantTerrain, nConstantMT865, nTimeStep, timeStepS, 300);
-plot_DTKF_result(structDTKF_2, structRBE_1, nConstantTerrain, nConstantMT865, nTimeStep, timeStepS, 305);
+%plot_DTKF_result(structDTKF_One, nConstantTerrain, nConstantMT865, nTimeStep, timeStepS, 300);
+plot_DTKF_result(structDTKF_2, nConstantTerrain, nConstantMT865, nTimeStep, timeStepS, 305);
 
 %plot_terrain_hypothesis_2(structRBE_One, structDTKF, nConstantMT865, nConstantTerrain, time, 'Hypotheses', 504)
 plot_terrain_hypothesis_2(structRBE_3, structDTKF_2, nConstantMT865, nConstantTerrain, time, 'Actual', 502)
 plot_terrain_hypothesis_2(structRBE_3, structDTKF_2, nConstantMT865, nConstantTerrain, time, 'Hypotheses', 520)
 
-plot_bayes_estimation(tractor1, structRBE_1, nConstantMT865, time, 505)
+%plot_bayes_estimation(tractor1, structRBE_1, nConstantMT865, time, 505)
 %plot_bayes_estimation(tractor1, structRBE_2, nConstantMT865, time, 600)
 plot_bayes_estimation(tractor1, structRBE_3, nConstantMT865, time, 605)
 

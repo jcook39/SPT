@@ -23,13 +23,10 @@ F_TNetHat = xHatPlus(3);
 tau_ResHat = xHatPlus(5);
 DBHat = xHatPlus(7); % notation is also R_S for drawbar pull
 
-% slipHat Calculation
-    if (omegaHat <= 0 ), slipHat = 0;
-    else slipHat = 1 - (vHat/(omegaHat*rollingRadiusM)); 
-        if slipHat < 0, slipHat = 0; end
-        if slipHat > 1, slipHat = 1; end
-    end
-slipHat = slipHat*100 + 1E-10;
+smoothedvHat = structDTKF.smoothedvHat(1,timeStepNo);
+
+slipHat = structDTKF.slipHat(1,timeStepNo);
+slipHatSmooth = structDTKF.slipHatSmooth(1,timeStepNo);
 
 % ---------------------- Unpack RBE Parameters ----------------------------
 terrainParameterEstimate = structRBE.parameterEstimate(:,timeStepNo);
@@ -47,7 +44,7 @@ throttleFeedForwardm1 = structTractionController.throttleFeedForward(timeStepNo-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ====== Logic for Activating/Deactivating Traction Controller ============
 if tractionControlIsOn
-    if slipHat < 5
+    if slipHatSmooth < 5
         tractionControlIsOn = 0;
         %gearShiftControlIsOn = 0;
         %gearShiftControlCountInt = 0;
@@ -56,7 +53,7 @@ if tractionControlIsOn
         feedForwardString = 'usePastValue';         
     end
 elseif ~tractionControlIsOn
-    if slipHat > 25
+    if slipHatSmooth > 25
         tractionControlIsOn = 1;
         gearShiftControlIsOn = 1;
         %gearShiftControlCountInt = (gearShiftControlUpdateRateHz/timeStepS) - 1;
@@ -78,7 +75,7 @@ if tractionControlIsOn
         error('Error: peak slip discrepancy, check function peak_traction')
     end
     iref = peakSlipNoLoad;
-    omegaRef = vHat/( rollingRadiusM*(1-(iref/100)) );
+    omegaRef = smoothedvHat/( rollingRadiusM*(1-(iref/100)) );
     if omegaRef < 0 % Need to compute minimum for gear selection
         omegaRef = 1;
     end
