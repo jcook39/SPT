@@ -112,7 +112,7 @@ vHat = xHatPlus(1,timeStepNo);
 smoothedvHat = smootherAd*smoothedvHatm1 + smootherBd*vHat;
 
 % ----------------- Calculate Estimates of Augmented States ---------------
-omegaHat = xHatPlus(1,timeStepNo);
+omegaHat = xHatPlus(2,timeStepNo);
 slipHat = calculate_slip(vHat, omegaHat, nConstantMT865);
 slipHatSmooth = calculate_slip(smoothedvHat,omegaHat,nConstantMT865);
 

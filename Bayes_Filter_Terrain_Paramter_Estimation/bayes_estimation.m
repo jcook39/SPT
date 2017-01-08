@@ -8,12 +8,13 @@ normalForceN = nConstantMT865.weightTractorN;
 
 % ------------------- Unpack Estimated State from DTKF --------------------
 estimatedState = structDTKF.xHatPlus(:,timeStepNo);
-vHat = estimatedState(1,1);
-omegaHat = estimatedState(2,1);
-forceVectorDTKF = [estimatedState(3,1) estimatedState(5,1)].';
-R_S = estimatedState(7,1);
-
-slipHat = calculate_slip(vHat, omegaHat, nConstantMT865);
+    vHat = estimatedState(1,1);
+    omegaHat = estimatedState(2,1);
+    forceVectorDTKF = [estimatedState(3,1) estimatedState(5,1)].';
+    DB = estimatedState(7,1);
+    
+slipHat = structDTKF.slipHat(1,timeStepNo);
+slipHatSmooth = structDTKF.slipHatSmoot(1,timeStepNo);
 
 % ----------------------- Unpack structRBE --------------------------------
 terrainHypotheses = structRBE.terrainHypotheses;
