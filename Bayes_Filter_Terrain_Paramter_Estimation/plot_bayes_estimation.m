@@ -12,9 +12,8 @@ SEstimate = structRBE.parameterEstimate(6,:);
 
 % This is the slip value at which the vehicle operates with maximum
 % traction force with no load (results show no difference with load)
-peakSlipLoadEstimate = structRBE.peakSlipTractionEstimate(4,:);
-netTractionNoLoadEstimateMax = structRBE.peakSlipTractionEstimate(1,:);
-
+peakSlip = structRBE.peakSlip;
+netTractionNoLoadEstimateMax = structRBE.netTractionNoLoadEstimateMax;
 slipVectorBayes = structRBE.slipVectorBayes;
 
 % ------------------ Terrain Parameters True  -----------------------------
@@ -110,7 +109,7 @@ subplot(122)
 
 figure(figureNo+2)
 subplot(121)
-    h = plot(time, peakSlipLoadEstimate, estimateColor, time, peakSlipLoadTrue, trueColor);
+    h = plot(time, peakSlip, estimateColor, time, peakSlipLoadTrue, trueColor);
     set(h(2),'linewidth',lineWidthSize)
     ylim([0 30])
     legend('Estimate','True')

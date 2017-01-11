@@ -18,13 +18,12 @@ slipHatSmooth = structDTKF.slipHatSmooth(1,timeStepNo);
 
 % ----------------------- Unpack structRBE --------------------------------
 terrainHypotheses = structRBE.terrainHypotheses;
-peakTractionMatHypotheses = structRBE.peakTractionMatHypotheses;
 prior = structRBE.terrainProbability(:,timeStepNo-1);
 nHypotheses = structRBE.nHypotheses;
 covarianceMatrix = structRBE.covarianceMatrix;
 lowProbThreshold = structRBE.lowProbThreshold;
 normalizeString = structRBE.normalizeString;
-
+slipVectorBayes = structRBE.slipVectorBayes;
 
 % --------------------------  Bayes Estimator -----------------------------
 
@@ -61,22 +60,28 @@ if isLowProbThresholdViolation
     indexMaxPosteriorProbability = (posteriorProbability == max(posteriorProbability));
     posteriorProbability(indexMaxPosteriorProbability) = posteriorProbability(indexMaxPosteriorProbability) - totalDiff;
     posteriorProbability(indexLowProbThresholdViolation) = lowProbThreshold;
-
 end
 
 % -------------------------------------------------------------------------
 
 
+% ----------------- Compute Peak Slip Point -------------------------------
 parameterEstimate = terrainHypotheses*posteriorProbability;
-peakSlipTractionEstimate = peakTractionMatHypotheses*posteriorProbability;
-
+[netTractionNoLoadEstimateMax, peakSlipNoLoad, ~, peakSlipLoad, ~] = ...
+    peak_traction(nConstantMT865, parameterEstimate, slipVectorBayes, 'MaxTraction');
+isSlipDiscrepancy = ( abs(peakSlipNoLoad - peakSlipLoad) > eps);
+if isSlipDiscrepancy
+    error('Error: peak slip discrepancy, check function peak_traction')
+end
+peakSlip = peakSlipNoLoad;
 
 % ------------------- Package Recrusive Bayes Structure -------------------
 structRBE.terrainProbability(:,timeStepNo) = posteriorProbability;
 structRBE.parameterEstimate(:,timeStepNo) = parameterEstimate.';
-structRBE.peakSlipTractionEstimate(:,timeStepNo) = peakSlipTractionEstimate;
 structRBE.liklihood(:,timeStepNo) = liklihood;
 structRBE.normalization(timeStepNo) = normalization;
+structRBE.peakSlip(1,timeStepNo) = peakSlip;
+structRBE.netTractionNoLoadEstimateMax(1,timeStepNo) = netTractionNoLoadEstimateMax;
 
 end
 

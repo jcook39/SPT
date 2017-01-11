@@ -14,7 +14,7 @@ nConstantMT865 = initialize_constant_tractors_parameters(resCoeff,bladderNo);
 
 %% -------------------- Initialize Terrain Inputs -------------------------
 nConstantTerrain.posXBoundry = [0 30 90];
-nConstantTerrain.cohesion = [6.1 3 6.3]; %2.75
+nConstantTerrain.cohesion = [6.1 3 6.3]; 
 nConstantTerrain.frictionAngle = [20 18.1 20];
 nConstantTerrain.n = [1 1 1];
 nConstantTerrain.keq = [500 333 500]; % Units in Meters (Keq) - does not seem to effect peak traction pt
@@ -89,9 +89,7 @@ structRBE_3.lowProbThreshold = 1e-4;
 structRBE_3 = terrain_hypothesis(structRBE_3, nConstantMT865,nTimeStep);
 
 % Traction Controller
-% Kp = 0.12
-% Ki = 0.05
-structTractionController = initialize_TractionController( 0.08, 0.00000001, 0.000000001, nConstantMT865, nTimeStep);
+structTractionController = initialize_TractionController( 0.35, 0.15, 0.000000001, nConstantMT865, nTimeStep);
 
 %% ------------------------ Initialize Structure --------------------------
 % Tractor 1

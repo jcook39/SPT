@@ -65,7 +65,7 @@ terrainHypotheses = [terrainHypothesisOne terrainHypothesisTwo terrainHypothesis
 
 % ------------------------- Terrain Hypotheses New ------------------------
 
-structRBE.slipVectorBayes = linspace(0.01, 100, 101);
+structRBE.slipVectorBayes = linspace(0.01, 100, 1001);
 
 [terrainHypotheses, peakTractionMatHypotheses] = build_terrain_hypotheses(structRBE, nConstantMT865, structRBE.slipVectorBayes);
 nHypotheses = size(terrainHypotheses,2);
@@ -74,15 +74,14 @@ structRBE.terrainHypotheses = terrainHypotheses;
 structRBE.terrainProbability = zeros(nHypotheses, nTimeStep);
 structRBE.terrainProbability(:,1) = 1/nHypotheses;
 structRBE.nHypotheses = nHypotheses;
-
 structRBE.covarianceMatrix = diag(covariance);
-%structRBE.lowProbThreshold = 1E-3;
-
+structRBE.peakSlip = zeros(1, nTimeStep);
 structRBE.peakTractionMatHypotheses = peakTractionMatHypotheses;
+
 
 end
 
-function [terrainMat, pkTractionMat] = build_terrain_hypotheses(structRBE, nConstantMT865, slip )
+function [terrainMat, peakTractionMat] = build_terrain_hypotheses(structRBE, nConstantMT865, slip )
 
 % Unpack hypotheses arrays
 c = structRBE.terrainHypDefCohesion;
@@ -103,9 +102,6 @@ nCombination = nCohesion*nPhi*nn*nkeq*nK*nS;
 terrainMat = zeros(6,nCombination);
 fprintf(' Number of Hypotheses = %f \n', nCombination)
 
-% Initialize peak traction matrix
-pkTractionMat = zeros(4,nCombination); % by column = [netTractionNoLoad, peakSlipNoLoad, netTractionLoad, peakSlipLoad].';
-
 % Fill Terrain Hypotheses Matrix
 terrainMatIndex = 1;
 for h = 1:nCohesion
@@ -117,10 +113,9 @@ for h = 1:nCohesion
            
 terrainMat(:,terrainMatIndex) = [c(h) phi(i) n(j) keq(k) K(m) S(p)].';
 [netTractionNoLoad, peakSlipNoLoad, netTractionLoad, peakSlipLoad] ...
-   = peak_traction(nConstantMT865, terrainMat(:,terrainMatIndex), slip, 'MaxTraction');
-pkTractionMat(:,terrainMatIndex) = [netTractionNoLoad  peakSlipNoLoad  netTractionLoad  peakSlipLoad].'; 
+ = peak_traction(nConstantMT865, terrainMat(:,terrainMatIndex), slip, 'MaxTraction');
+peakTractionMat(:,terrainMatIndex) = [netTractionNoLoad  peakSlipNoLoad  netTractionLoad  peakSlipLoad].'; 
 terrainMatIndex = terrainMatIndex + 1;
-           
                    end
                end
            end

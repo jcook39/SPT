@@ -29,8 +29,7 @@ slipHat = structDTKF.slipHat(1,timeStepNo);
 slipHatSmooth = structDTKF.slipHatSmooth(1,timeStepNo);
 
 % ---------------------- Unpack RBE Parameters ----------------------------
-terrainParameterEstimate = structRBE.parameterEstimate(:,timeStepNo);
-slipVectorBayes = structRBE.slipVectorBayes;
+peakSlip = structRBE.peakSlip(1,timeStepNo);
 
 % --------- Unpack Controller Structure: structTractionController ---------
 tractionControlIsOn = structTractionController.tractionControlIsOn(timeStepNo-1);
@@ -68,13 +67,8 @@ end
 fprintf('controlIsOn = %f \n',tractionControlIsOn)
 if tractionControlIsOn
     
-    % --------- Compute Reference Slip and Track Speed Input --------------
-    [~, peakSlipNoLoad, ~, peakSlipLoad, ~] = peak_traction(nConstantMT865, terrainParameterEstimate, slipVectorBayes, 'MaxTraction');
-    isSlipDiscrepancy = ( abs(peakSlipNoLoad - peakSlipLoad) > eps);
-    if isSlipDiscrepancy
-        error('Error: peak slip discrepancy, check function peak_traction')
-    end
-    iref = peakSlipNoLoad;
+    % -------------- Compute Track Speed Input ----------------------------
+    iref = peakSlip;
     omegaRef = smoothedvHat/( rollingRadiusM*(1-(iref/100)) );
     if omegaRef < 0 % Need to compute minimum for gear selection
         omegaRef = 1;
@@ -110,7 +104,7 @@ if tractionControlIsOn
     %Ki = structTractionController.KiGR(gearNo);
     errorOmega = omegaRef - omegaHat;
     [throttleControllerPID] = PID_F_Control(structTractionController, errorOmega, gear, timeStepNo);
-    %errorOmegaIntegrated = errorOmegaIntegrated + errorOmega*timeStepS;
+    errorOmegaIntegrated = errorOmegaIntegrated + errorOmega*timeStepS;
     throttleControllerPIDFF = throttleFeedForward + throttleControllerPID;
     if throttleControllerPIDFF > 1 
         throttleControllerPIDFF = 1;
@@ -144,7 +138,6 @@ elseif ~tractionControlIsOn
     errorOmega = 0;
     throttleFeedForward = NaN;
     %torqueFeedForwardNM = NaN;
-    peakSlipNoLoad = NaN;
     iref = NaN;
     omegaRef = NaN;
     throttleControllerPIDFF = 0;
@@ -159,7 +152,7 @@ structTractionController.errorOmegaIntegrated(timeStepNo,1) = errorOmegaIntegrat
 structTractionController.errorOmega(timeStepNo,1) = errorOmega;
 structTractionController.throttleFeedForward(timeStepNo,1) = throttleFeedForward;
 %structTractionController.torqueFeedForwardNM(timeStepNo,1) = torqueFeedForwardNM;
-structTractionController.peakSlip(timeStepNo,1) = peakSlipNoLoad;
+structTractionController.peakSlip(timeStepNo,1) = peakSlip;
 structTractionController.iref(timeStepNo,1) = iref;
 structTractionController.omegaRef(timeStepNo,1) = omegaRef; 
 structTractionController.throttleControllerPIDFF(timeStepNo,1) = throttleControllerPIDFF;
