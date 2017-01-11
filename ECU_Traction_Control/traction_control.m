@@ -106,19 +106,20 @@ if tractionControlIsOn
     end
     
     % --------------------- PI CONTROLLER ---------------------------------
-    Kp = structTractionController.KpGR(gearNo);
-    Ki = structTractionController.KiGR(gearNo);
+    %Kp = structTractionController.KpGR(gearNo);
+    %Ki = structTractionController.KiGR(gearNo);
     errorOmega = omegaRef - omegaHat;
-    errorOmegaIntegrated = errorOmegaIntegrated + errorOmega*timeStepS;
-    throttleController = throttleFeedForward + Kp*errorOmega + Ki*errorOmegaIntegrated;
-    if throttleController > 1 
-        throttleController = 1;
-    elseif throttleController < 0
-        throttleController = 0;
+    [throttleControllerPID] = PID_F_Control(structTractionController, errorOmega, gear, timeStepNo);
+    %errorOmegaIntegrated = errorOmegaIntegrated + errorOmega*timeStepS;
+    throttleControllerPIDFF = throttleFeedForward + throttleControllerPID;
+    if throttleControllerPIDFF > 1 
+        throttleControllerPIDFF = 1;
+    elseif throttleControllerPIDFF < 0
+        throttleControllerPIDFF = 0;
     end
     
     % --------- EXPORT THROTTLE CONTROLLER COMMAND TO INPUT ---------------
-    input(1) = throttleController;
+    input(1) = throttleControllerPIDFF;
     
 elseif ~tractionControlIsOn
     
@@ -140,13 +141,14 @@ elseif ~tractionControlIsOn
     end
     
     errorOmegaIntegrated = 0;
-    errorOmega = NaN;
+    errorOmega = 0;
     throttleFeedForward = NaN;
     %torqueFeedForwardNM = NaN;
     peakSlipNoLoad = NaN;
     iref = NaN;
     omegaRef = NaN;
-    throttleController = 0;
+    throttleControllerPIDFF = 0;
+    throttleControllerPID = 0;
     
     gearShiftFlag = NaN;
     
@@ -160,7 +162,8 @@ structTractionController.throttleFeedForward(timeStepNo,1) = throttleFeedForward
 structTractionController.peakSlip(timeStepNo,1) = peakSlipNoLoad;
 structTractionController.iref(timeStepNo,1) = iref;
 structTractionController.omegaRef(timeStepNo,1) = omegaRef; 
-structTractionController.throttleController(timeStepNo,1) = throttleController;
+structTractionController.throttleControllerPIDFF(timeStepNo,1) = throttleControllerPIDFF;
+structTractionController.throttleControllerPID(timeStepNo,1) = throttleControllerPID;
 structTractionController.tractionControlIsOn(timeStepNo,1) = tractionControlIsOn;
 structTractionController.gearShiftControlIsOn(timeStepNo,1) = gearShiftControlIsOn;
 structTractionController.gearShiftControlCountInt(timeStepNo,1) = gearShiftControlCountInt;
@@ -170,9 +173,48 @@ fprintf('engine RPM = %f \n', engSpeedRadPS*(60/(2*pi)) )
 end
 
 
+function [throttleControllerPID] = PID_F_Control(structTractionController, errorOmega, gear, timeStepNo)
+
+% --------------------- Unpack Needed Parameters --------------------------
+% Controller Parameters
+sysControllerD = structTractionController.sysControllerD;
+sysControllerDTFnum = sysControllerD.num{:,:,gear,1};
+sysControllerDTFden = sysControllerD.den{:,:,gear,1};
+fprintf('a = %f %f %f \n',sysControllerDTFden)
+fprintf('b = %f %f %f \n',sysControllerDTFnum)
+
+b0 = sysControllerDTFnum(1,1);
+b1 = sysControllerDTFnum(1,2);
+b2 = sysControllerDTFnum(1,3);
+
+a0 = sysControllerDTFden(1,1);
+a1 = sysControllerDTFden(1,2);
+a2 = sysControllerDTFden(1,3);
+
+% Look up past error values and inputs
+ek = errorOmega;
+if (timeStepNo-1) <= 0
+    ekm1 = 0;
+    ukm1 = 0;
+else
+    ekm1 = structTractionController.errorOmega(timeStepNo-1,1);
+    ukm1 = structTractionController.throttleControllerPID(timeStepNo-1,1);
+end
+    
+if (timeStepNo-2) <= 0
+    ekm2 = 0;
+    ukm2 = 0;
+else
+    ekm2 = structTractionController.errorOmega(timeStepNo-2,1);
+    ukm2 = structTractionController.throttleControllerPID(timeStepNo-2,1);
+end   
+
+% ------------------- Compute Control Input -------------------------------
+throttleControllerPID = (1/a0)*(-ukm1*a1 - ukm2*a2...
+    + b0*ek + b1*ekm1 + b2*ekm2)
 
 
-
+end
 
 
 

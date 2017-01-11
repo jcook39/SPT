@@ -30,7 +30,7 @@ nConstantTerrain = generate_terrain(nConstantTerrain,nConstantMT865);
 
 %% --------------- Set Simulation Integration Time Steps ------------------
 timeStepS = 0.05;
-simulationTime = 40;
+simulationTime = 45;
 time = [0:timeStepS:simulationTime].'; % Time array based on sample time and total simulation time
 nTimeStep = size(time,1); % Total number of time steps
 
@@ -89,7 +89,9 @@ structRBE_3.lowProbThreshold = 1e-4;
 structRBE_3 = terrain_hypothesis(structRBE_3, nConstantMT865,nTimeStep);
 
 % Traction Controller
-structTractionController = initialize_TractionController( 0.12, 0.05, nConstantMT865, nTimeStep);
+% Kp = 0.12
+% Ki = 0.05
+structTractionController = initialize_TractionController( 0.08, 0.00000001, 0.000000001, nConstantMT865, nTimeStep);
 
 %% ------------------------ Initialize Structure --------------------------
 % Tractor 1

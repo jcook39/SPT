@@ -34,14 +34,6 @@ DBHat = xHatPlus(7,:); % notation is also R_S for drawbar pull
 % slipHat Calculation
 slipHat = structDTKF.slipHat;
 slipHatSmooth = structDTKF.slipHatSmooth;
-% for i = 1:nTimeStep
-%     if (omegaHat(i) <= 0 ), slipHat(i) = 0;
-%     else slipHat(i) = 1 - (vHat(i)/(omegaHat(i)*rollingRadiusM)); 
-%         if slipHat(i) < 0, slipHat(i) = 0; end
-%         if slipHat(i) > 1, slipHat(i) = 1; end
-%     end
-% slipHat(i) = slipHat(i)*100 + 1E-10;
-% end
 
 % ------------------ Unpack Controller Structure --------------------------
 errorOmegaIntegrated = structTractionController.errorOmegaIntegrated;
@@ -51,7 +43,7 @@ errorOmega = structTractionController.errorOmega;
 %peakSlipNoLoad = structTractionController.peakSlip;
 iref = structTractionController.iref;
 omegaRef = structTractionController.omegaRef; 
-throttleController = structTractionController.throttleController;
+throttleControllerPIDF = structTractionController.throttleControllerPIDFF;
 tractionControlIsOn = structTractionController.tractionControlIsOn;
 
 gearNo = structTractionController.gearNo;
@@ -106,7 +98,7 @@ subplot(232)
     plot(timeVector, omegaRef, refColor, timeVector, w, trueColor, timeVector, omegaHat, estimatedColor)
     legend('\omega_{ref}','\omega','\omega_{est}')
 subplot(233)
-    plot(timeVector, throttleController)
+    plot(timeVector, throttleControllerPIDF)
     ylabel('throttle Controller')
 subplot(234)
     plot(timeVector, errorOmega)
