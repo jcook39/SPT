@@ -99,8 +99,8 @@ for timeStepNo = 2:nTimeStep
     [inputMatOne(timeStepNo-1,:), controllerLead] = heading_control(tractorOne(timeStepNo-1), inputMatOne(timeStepNo-1,:), controllerLead, wayPointFlagMatNew(timeStepNo-1,:).', timeStepS, timeStepNo);
     [tractorOne(timeStepNo)] = dynamics_MB_tractor(tractorOne(timeStepNo-1),inputMatOne(timeStepNo-1,:),nConstantMT865,nConstantTerrain,timeStepS);
     
-    % [inputMatTwo(timeStepNo-1,:), controllerFollowOne, waypoint, nWayPointFollowEval] = speed_heading_control(tractorOne(timeStepNo-1), tractorTwo(timeStepNo-1), inputMatTwo(timeStepNo-1,:), controllerFollowOne, waypoint, nWayPointFollowEval, timeStepS, timeStepNo);
-    % [tractorTwo(timeStepNo)] = dynamics_MB_tractor(tractorTwo(timeStepNo-1),inputMatTwo(timeStepNo-1,:),nConstantMT865,nConstantTerrain,timeStepS);
+    [inputMatTwo(timeStepNo-1,:), controllerFollowOne, waypoint, nWayPointFollowEval] = speed_heading_control(tractorOne(timeStepNo-1), tractorTwo(timeStepNo-1), inputMatTwo(timeStepNo-1,:), controllerFollowOne, waypoint, nWayPointFollowEval, timeStepS, timeStepNo);
+    [tractorTwo(timeStepNo)] = dynamics_MB_tractor(tractorTwo(timeStepNo-1),inputMatTwo(timeStepNo-1,:),nConstantMT865,nConstantTerrain,timeStepS);
 
     fprintf('Simulation Time Complete: %f \n',timeStepNo*timeStepS - timeStepS)
     
@@ -110,8 +110,8 @@ end
 %% %%%%%%%%%%%%%%%%%%%% SHOW RESULTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 plot_result(tractorOne,inputMatOne,'r',nTimeStep,nConstantTerrain,nConstantMT865,timeStepS,tractorOneColor,'plotContour');
-%plot_way_points(waypoint,nWayPointFollowEval,'kx','wo');
-%plot_result(tractorTwo,inputMatTwo,'b:',nTimeStep,nConstantTerrain,nConstantMT865,timeStepS,tractorTwoColor,0);
+plot_way_points(waypoint,nWayPointFollowEval,'kx','wo');
+plot_result(tractorTwo,inputMatTwo,'b:',nTimeStep,nConstantTerrain,nConstantMT865,timeStepS,tractorTwoColor,0);
 %latex_figures()
 
 

@@ -69,7 +69,7 @@ end
 function wayPointStateFollower = way_point_log_follower(tractorLead,controller)
 
 % Unpack controller paramters 
-Refq1 = controller.Refq1; % flexible y
+refDlat = controller.refDlat; % flexible y
 
 %
 wayPointStateLeader = way_point_log_leader(tractorLead);
@@ -77,7 +77,7 @@ XLead = wayPointStateLeader(1,1);
 YLead = wayPointStateLeader(2,1);
 gpsHeadingLead = wayPointStateLeader(3,1);
 
-wayPointFollower = [XLead YLead 0].' + rotation_matrix_z(-gpsHeadingLead)*[0 Refq1 0].';
+wayPointFollower = [XLead YLead 0].' + rotation_matrix_z(-gpsHeadingLead)*[0 refDlat 0].';
 wayPointStateFollower = [wayPointFollower(1,1) wayPointFollower(2,1) 0 0 0].';
 
 end

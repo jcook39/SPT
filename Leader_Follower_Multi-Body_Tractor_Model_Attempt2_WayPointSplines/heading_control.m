@@ -26,7 +26,7 @@ headingError = headingRef - gpsHeading;
 headingIntegratedError = headingIntegratedError + headingError*timeStepS;
 
 % Compute Control Inputs
-[steerPumpCmdPI] = PI_Heading_Control(controller, headingError, timeStepNo);
+[steerPumpCmdPI] = PI_Heading_Control_Diff_EQ(controller, headingError, timeStepNo);
 
 % Package Output as a row vector
 inputVecOut = [inputVecIn(1), inputVecIn(2), steerPumpCmdPI, inputVecIn(4), inputVecIn(5)];
