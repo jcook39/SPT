@@ -128,9 +128,10 @@ plot_tractor_on_map(tractor,nTimeStep,nConstantMT865,tractorColor)
 % annotation('textarrow', xStartArrow, yStartArrow, 'String', 'Start Position','fontsize',16)
 
 %title('Friction Angle of Terrain')
-ylabel('North Position (meters)','interpreter','latex','FontSize',20)
-xlabel('East Position (meters)','interpreter','latex','FontSize',20)
-xlim([35 315])
+ylabel('North Position (meters)','interpreter','latex','FontSize',30,'fontname','timesnewroman')
+xlabel('East Position (meters)','interpreter','latex','FontSize',30,'fontname','timesnewroman')
+set(gca,'FontSize',24)
+xlim([75 315])
 ylim([130 270])
 hold on
 

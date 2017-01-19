@@ -89,7 +89,7 @@ structRBE_3.lowProbThreshold = 1e-4;
 structRBE_3 = terrain_hypothesis(structRBE_3, nConstantMT865,nTimeStep);
 
 % Traction Controller
-structTractionController = initialize_TractionController( 0.35, 0.15, 0.000000001, nConstantMT865, nTimeStep);
+structTractionController = initialize_TractionController( 0.35, 0.15, 1E-6, nConstantMT865, nTimeStep);
 
 %% ------------------------ Initialize Structure --------------------------
 % Tractor 1

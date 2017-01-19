@@ -21,7 +21,7 @@ Tf = 0.000001;
 ControllerC = pid(KpGR(1:16).', KiGR(1:16).', KdGR(1:16).', Tf);
 controllerSampleTime = 0.05; % 20 Hz;
 sysControllerC = tf(ControllerC);
-sysControllerD = c2d(sysControllerC,controllerSampleTime,'tustin')
+sysControllerD = c2d(sysControllerC,controllerSampleTime,'tustin');
 
 % ----------------- Package controller structure --------------------------
 structTractionController.KpGR = KpGR;
