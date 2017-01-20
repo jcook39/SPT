@@ -4,15 +4,15 @@ function plot_follower_speed_heading_control(controller,timeStepS,nTimeStep)
 indexVector = 1:nTimeStep;
 timeVector = (indexVector-1)*timeStepS;
 
-headingRef = controller.headingRef(indexVector);
-headingError = controller.errorMatrix(1,indexVector);
-headingIntegratedError = controller.integratedErrorMatrix(1,indexVector);
+headingRef = controller.headingRef;
+headingError = controller.headingError;
+headingIntegratedError = controller.headingIntegratedError;
 steerPumpCmd = controller.steerPumpCmd;
 
-speedRef = controller.speedRef(indexVector);
-speedError = controller.errorMatrix(2,indexVector);
-speedIntegratedError = controller.integratedErrorMatrix(2,indexVector);
-throttleCommand = controller.throttleCommand(indexVector,1);
+speedRef = controller.speedRef;
+speedError = controller.speedError;
+speedIntegratedError = controller.speedIntegratedError;
+throttleCommand = controller.throttleCommand;
 errorx = controller.errorx;
 
 figure(12)

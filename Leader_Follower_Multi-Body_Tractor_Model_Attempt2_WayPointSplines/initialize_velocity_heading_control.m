@@ -24,6 +24,8 @@ controllerStruct.speedIntegratedError = zeros(size(timeArray,1),1);
 controllerStruct.steerPumpCmd = zeros(size(timeArray,1),1);
 controllerStruct.steerPumpCmdPI = zeros(size(timeArray,1),1);
 controllerStruct.throttleCommand = zeros(size(timeArray,1),1);
+controllerStruct.throttleCommandPI = zeros(size(timeArray,1),1);
+
 
 % Build speed controller difference equation
 vConC = pid(Kpv, Kiv);

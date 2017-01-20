@@ -51,15 +51,18 @@ speedRef = -kx*errorx + speedLead;
 speedError = speedRef - speedFollow;
 speedIntegratedError = speedIntegratedError + speedError*timeStepS;
 
-throttleCommand = throttleFeedForward + Kpv*speedError + Kiv*speedIntegratedError;
-%throttleCommand = throttleFeedForward + Kp_speed*speedError;
-if throttleCommand > 1
-    fprintf('Throttle Controller is Saturating %f \n',throttleCommand)
-    throttleCommand = 1;
-elseif throttleCommand < 0
-    fprintf('Throttle Controller is Low Saturating %f \n', throttleCommand)
-    throttleCommand = 0;
-end
+[throttleCommandPI] = PI_Velocity_Control_Diff_EQ(controller, speedError, timeStepNo);
+throttleCommand = throttleFeedForward + throttleCommandPI;
+
+% throttleCommand = throttleFeedForward + Kpv*speedError + Kiv*speedIntegratedError;
+% %throttleCommand = throttleFeedForward + Kp_speed*speedError;
+% if throttleCommand > 1
+%     fprintf('Throttle Controller is Saturating %f \n',throttleCommand)
+%     throttleCommand = 1;
+% elseif throttleCommand < 0
+%     fprintf('Throttle Controller is Low Saturating %f \n', throttleCommand)
+%     throttleCommand = 0;
+% end
 
 % Package Output as a row vector
 inputVecOut(1,1) = throttleCommand;
@@ -67,8 +70,40 @@ inputVecOut(1,1) = throttleCommand;
 % Package controller error and integrated Error signals
 controller.speedError(timeStepNo,1) = speedError;
 controller.speedIntegratedError(timeStepNo,1) = speedIntegratedError;
-controller.speedRef(timeStepNo-1,:) = speedRef;
-controller.errorx(timeStepNo-1) = errorx;
-controller.throttleCommand(timeStepNo-1,1) = throttleCommand;
+controller.speedRef(timeStepNo,1) = speedRef;
+controller.errorx(timeStepNo,1) = errorx;
+controller.throttleCommand(timeStepNo,1) = throttleCommand;
+controller.throttleCommandPI(timeStepNo,1) = throttleCommandPI;
+
+end
+
+
+function [throttleCommandPI] = PI_Velocity_Control_Diff_EQ(controller, speedError, timeStepNo)
+
+% --------------------- Unpack Needed Parameters --------------------------
+% Controller Parameters
+vSysConD = controller.hSysConD;
+vSysConDTFnum = vSysConD.num{1};
+vSysConDTFden = vSysConD.den{1};
+
+b0 = vSysConDTFnum(1,1);
+b1 = vSysConDTFnum(1,2);
+
+a0 = vSysConDTFden(1,1);
+a1 = vSysConDTFden(1,2);
+
+% Look up past error values and inputs
+ek = speedError;
+if (timeStepNo-1) <= 0
+    ekm1 = 0;
+    ukm1 = 0;
+else
+    ekm1 = controller.speedError(timeStepNo-1,1);
+    ukm1 = controller.throttleCommandPI(timeStepNo-1,1);
+end
+      
+
+% ------------------- Compute Control Input -------------------------------
+throttleCommandPI = (1/a0)*(-ukm1*a1 + b0*ek + b1*ekm1);
 
 end

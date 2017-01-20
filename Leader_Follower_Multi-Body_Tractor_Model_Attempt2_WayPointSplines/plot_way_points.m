@@ -20,9 +20,9 @@ figure(1)
     end
     plot(nWayPointFollowEval(nWayPoint-1).wayPointFollowEval(1,1),nWayPointFollowEval(nWayPoint-1).wayPointFollowEval(1,2),'bx','linewidth',lineWidthSelectedWayPoint)
     hold on
-    xArrow = [0.82 0.844];
-    yArrow = [0.3 0.44];
-    a = annotation('textarrow', xArrow, yArrow, 'String', 'selected waypoint','fontsize',16,'color','b', 'HeadLength', 20, 'HeadWidth',20, 'linewidth', 2);
-    dim = [0.835 0.442 0.015 0.015];
-    annotation('ellipse',dim,'color','b','linewidth',1)
+%     xArrow = [0.82 0.844];
+%     yArrow = [0.3 0.44];
+%     a = annotation('textarrow', xArrow, yArrow, 'String', 'selected waypoint','fontsize',16,'color','b', 'HeadLength', 20, 'HeadWidth',20, 'linewidth', 2);
+%     dim = [0.835 0.442 0.015 0.015];
+%     annotation('ellipse',dim,'color','b','linewidth',1)
 end

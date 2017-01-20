@@ -55,10 +55,10 @@ wayPointFlagMatNew  = wayPointMat_make(wayPointFlagMat,timeScheduleInput, timeSt
 
 %% Initialize Controller Parameters 
 Kph = 2;
-Kih = 0.05;
-Kpv = 5;
+Kih = 0.1;
+Kpv = 2;
 Kiv = 1;
-kx = 0.025; % orignal value was 0.1
+kx = 0.25; % orignal value was 0.1
 refDlong = -50;
 refDlat = -1;
 controllerStruct = initialize_velocity_heading_control(Kpv, Kiv, Kph, Kih, kx, refDlong, refDlat, timeArray);
@@ -116,7 +116,6 @@ plot_result(tractorTwo,inputMatTwo,'b:',nTimeStep,nConstantTerrain,nConstantMT86
 
 
 %plot_heading_control_performance(controllerLead,wayPointFlagMatNew,timeStepS,nTimeStep);
-
 %plot_follower_speed_heading_control(controllerFollowOne,timeStepS,nTimeStep)
 
 
