@@ -13,15 +13,20 @@ bladderNo = 8;
 nConstantMT865 = initialize_constant_tractors_parameters(resCoeff,bladderNo);
 
 %% -------------------- Initialize Terrain Inputs -------------------------
-nConstantTerrain.posXBoundry = [0 30 90];
-nConstantTerrain.cohesion = [6.1 3 6.3]; 
-nConstantTerrain.frictionAngle = [20 18.1 20];
-nConstantTerrain.n = [1 1 1];
-nConstantTerrain.keq = [500 333 500]; % Units in Meters (Keq) - does not seem to effect peak traction pt
-nConstantTerrain.K = [2 0.7 4];
-nConstantTerrain.S = [0.6/33 0.8/33 0.6/33];
-nConstantTerrain.terrainActual = [nConstantTerrain.cohesion; nConstantTerrain.frictionAngle; ...
-    nConstantTerrain.n; nConstantTerrain.keq; nConstantTerrain.K; nConstantTerrain.S];
+% Terrain Bondries: nLocX = [minX1 maxX1; minX2 maxX2; ... ];
+%                   nLocY = [minY1 maxY1; minY2 maxY2; ... ];
+nConstantTerrain.nLocX = [0 30; 30 120; 120 150]; 
+nConstantTerrain.nLocY = [0 100; 0 100; 0 100];
+% Terrain Vectors for each boundry
+nConstantTerrain.cohesion = [6.1 3 6.3].'; 
+nConstantTerrain.frictionAngle = [20 18.1 20].';
+nConstantTerrain.n = [1 1 1].';
+nConstantTerrain.keq = [500 333 500].'; % Units in Meters (Keq) - does not seem to effect peak traction pt
+nConstantTerrain.K = [2 0.7 4].';
+nConstantTerrain.S = [0.6/33 0.8/33 0.6/33].';
+nConstantTerrain.terrainActual = [nConstantTerrain.cohesion.'; nConstantTerrain.frictionAngle.'; ...
+    nConstantTerrain.n.'; nConstantTerrain.keq.'; nConstantTerrain.K.'; nConstantTerrain.S.'];
+% Grid Specifications
 nConstantTerrain.gridSizeXM = 300;
 nConstantTerrain.gridSizeYM = 150;
 nConstantTerrain.gridResolutionM = 0.1;
@@ -30,7 +35,7 @@ nConstantTerrain = generate_terrain(nConstantTerrain,nConstantMT865);
 
 %% --------------- Set Simulation Integration Time Steps ------------------
 timeStepS = 0.05;
-simulationTime = 45;
+simulationTime = 60;
 time = [0:timeStepS:simulationTime].'; % Time array based on sample time and total simulation time
 nTimeStep = size(time,1); % Total number of time steps
 

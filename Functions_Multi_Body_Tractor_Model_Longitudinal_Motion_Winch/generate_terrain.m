@@ -124,87 +124,86 @@ nConstantTerrain.Y = Y;
 end
 
 function nConstantTerrain = generate_terrain_grid(nConstantTerrain,nConstantMT865)
-    
-    % Unpack Needed Constant Tractor Parameters
-    trackAreaM2 = nConstantMT865.trackAreaM2;
-    trackLengthM = nConstantMT865.trackLengthM;
-    normalForceTrackN = nConstantMT865.normalForceTrackN;
-    RsledN = nConstantMT865.RsledN;
-    
-    % Unpack Terrain Creation Parameters
-    B2 = nConstantTerrain.posXBoundry(2);
-    B3 = nConstantTerrain.posXBoundry(3);
-    frictionAngle1 = nConstantTerrain.frictionAngle(1);
-    frictionAngle2 = nConstantTerrain.frictionAngle(2);
-    frictionAngle3 = nConstantTerrain.frictionAngle(3);
-    cohesion1 = nConstantTerrain.cohesion(1);
-    cohesion2 = nConstantTerrain.cohesion(2);
-    cohesion3 = nConstantTerrain.cohesion(3);
-    K1 = nConstantTerrain.K(1);
-    K2 = nConstantTerrain.K(2);
-    K3 = nConstantTerrain.K(3);
-    keq1 = nConstantTerrain.keq(1);
-    keq2 = nConstantTerrain.keq(2);
-    keq3 = nConstantTerrain.keq(3);
-    n1 = nConstantTerrain.n(1);
-    n2 = nConstantTerrain.n(2);
-    n3 = nConstantTerrain.n(3);
-    S1 = nConstantTerrain.S(1);
-    S2 = nConstantTerrain.S(2);
-    S3 = nConstantTerrain.S(3);
-    
-    gridSizeXM = nConstantTerrain.gridSizeXM;
-    gridSizeYM = nConstantTerrain.gridSizeYM;
-    gridResolutionM = nConstantTerrain.gridResolutionM;
-    
-   
-    % Lay Out Grid
-    [X , Y] = meshgrid(0:gridResolutionM:gridSizeXM,0:gridResolutionM:gridSizeYM); 
-   
-    % Friction Angle
-    terrainFrictionAngle = zeros(size(X));
-    terrainFrictionAngle(X < B2) = frictionAngle1;
-    terrainFrictionAngle((X >= B2) & (X < B3)) = frictionAngle2;
-    terrainFrictionAngle(X >= B3) = frictionAngle3;
-    nConstantTerrain.terrainFrictionAngle = terrainFrictionAngle;
-  
-    % Cohesion
-    terrainCohesion = zeros(size(X));
-    terrainCohesion(X < B2) = cohesion1;
-    terrainCohesion((X >= B2) & (X < B3)) = cohesion2;
-    terrainCohesion(X >= B3) = cohesion3;
-    nConstantTerrain.terrainCohesion = terrainCohesion;
-    
-    % Shear Deformation Modulus: K (cm)
-    terrainK = zeros(size(X));
-    terrainK(X < B2) = K1;
-    terrainK((X >= B2) & (X < B3)) = K2;
-    terrainK(X >= B3) = K3;
-    nConstantTerrain.terrainK = terrainK;
-    
-    % keq (M)
-    terrainkeq = zeros(size(X));
-    terrainkeq(X < B2) = keq1;
-    terrainkeq((X >= B2) & (X < B3)) = keq2;
-    terrainkeq(X >= B3) = keq3;
-    nConstantTerrain.terrainkeq = terrainkeq;
-    
-    % n (M)
-    terrainn = zeros(size(X));
-    terrainn(X < B2) = n1;
-    terrainn((X >= B2) & (X < B3)) = n2;
-    terrainn(X >= B3) = n3;
-    nConstantTerrain.terrainn = terrainn;
-    
-    % S (M)
-    terrainS = zeros(size(X));
-    terrainS(X < B2) = S1;
-    terrainS((X >= B2) & (X < B3)) = S2;
-    terrainS(X >= B3) = S3;
-    nConstantTerrain.terrainS = terrainS;
-    
-    nConstantTerrain.X = X;
-    nConstantTerrain.Y = Y;
+
+% Unpack nConstantTerrain Parameters
+nLocX = nConstantTerrain.nLocX;
+nLocY = nConstantTerrain.nLocY;
+gridSizeXM = nConstantTerrain.gridSizeXM;
+gridSizeYM = nConstantTerrain.gridSizeYM;
+gridResolutionM = nConstantTerrain.gridResolutionM;
+% Terrain Parameters Vectors
+frictionAngle = nConstantTerrain.frictionAngle;
+cohesion = nConstantTerrain.cohesion;
+n = nConstantTerrain.n;
+keq = nConstantTerrain.keq;
+K = nConstantTerrain.K;
+S = nConstantTerrain.S;
+
+
+% Lay Out Grid
+[X , Y] = meshgrid(0:gridResolutionM:gridSizeXM,0:gridResolutionM:gridSizeYM); 
+
+% Friction Angle
+terrainFrictionAngle = zeros(size(X));
+terrainFrictionAngle = build_terrain_property_map(terrainFrictionAngle, frictionAngle, nLocX, nLocY, X, Y);
+nConstantTerrain.terrainFrictionAngle = terrainFrictionAngle;
+
+% Cohesion
+terrainCohesion = zeros(size(X));
+terrainCohesion = build_terrain_property_map(terrainCohesion, cohesion, nLocX, nLocY, X, Y);
+nConstantTerrain.terrainCohesion = terrainCohesion;
+
+% Shear Deformation Modulus: K (cm)
+terrainK = zeros(size(X));
+terrainK = build_terrain_property_map(terrainK, K, nLocX, nLocY, X, Y);
+nConstantTerrain.terrainK = terrainK;
+
+% keq (M)
+terrainkeq = zeros(size(X));
+terrainkeq = build_terrain_property_map(terrainkeq, keq, nLocX, nLocY, X, Y);
+nConstantTerrain.terrainkeq = terrainkeq;
+
+% n (M)
+terrainn = zeros(size(X));
+terrainn = build_terrain_property_map(terrainn, n, nLocX, nLocY, X, Y);
+nConstantTerrain.terrainn = terrainn;
+
+% S (M)
+terrainS = zeros(size(X));
+terrainS = build_terrain_property_map(terrainS, S, nLocX, nLocY, X, Y);
+nConstantTerrain.terrainS = terrainS;
+
+nConstantTerrain.X = X;
+nConstantTerrain.Y = Y;
+
+end
+
+function terrainPropertyMesh =  build_terrain_property_map(terrainPropertyMesh, terrainPropertyValue, nLocX, nLocY, X, Y)
+
+numLocX = size(nLocX,1);
+numLocY = size(nLocY,1);
+if numLocX ~= numLocY
+    error('must provide the same number of x and y points to generate the terrain map')
+end
+numLoc = numLocX;
+
+for i = 1:numLoc
+    terrainPropertyMesh = build_terrain_property_mesh(terrainPropertyMesh, terrainPropertyValue(i,1), nLocX(i,:), nLocY(i,:), X, Y);
+end
+
+end
+
+function terrainPropertyMesh = build_terrain_property_mesh(terrainPropertyMesh, terrainPropertyValue, locX, locY, X, Y)
+
+% locX = [minX maxX]
+% locY = [minY maxY]
+
+minX = locX(1,1);
+maxX = locX(1,2);
+minY = locY(1,1);
+maxY = locY(1,2);
+
+terrainPropertyMesh( (minX <= X) & (X < maxX) & (minY <= Y) & (Y < maxY)) = terrainPropertyValue;
 
 end
 
