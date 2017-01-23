@@ -163,40 +163,40 @@ end % end for
 
     figure(figureNo)
     subplot(231)
-        plot( slip, zeros(numel(slip),1),'k:',slip, F_TNetMatAct(:,1),'--', slip, F_TNetMatAct(:,2),'--', slip, F_TNetMatAct(:,3),'--',...
+        plot( slip, zeros(numel(slip),1),'k:',slip, F_TNetMatAct,...
             slipVectorEstimate, xHatPlus(3,indexVector), estimateColor, slipVectorTrue, x(3,indexVector),trueColor)
         ylabel('Net Traction (N)')
         xlabel('slip ratio')
         xlim([0 100])
-        legend('Zero Mark','Act1','Act2','Act3','Estimate','True','Location','SouthEast')
+        legend('Zero Mark','Terrain1','Terrain2','Terrain3','Terrain4','Terrain5','Terrain6',...
+            'Terrain7','Terrain8','Terrain9','Terrain10','Terrain11','Terrain12',...
+            'Terrain13','Terrain14','Terrain15','Estimate','True','Location','SouthEast')
         hold on
     subplot(232)
-        plot( slip, FAct(:,1), slip, FAct(:,2), slip, FAct(:,3))
+        plot( slip, FAct)
         legend('Act1','Act2','Act3')
         ylabel('Gross Traction (N)')
         xlabel('slip ratio')
         hold on
     subplot(233)
-        plot(slip, tauResAct(:,1), slip, tauResAct(:,2), slip, tauResAct(:,3),...
-            slipVectorEstimate, xHatPlus(5,indexVector), estimateColor, slipVectorTrue, x(5,indexVector),trueColor)
+        plot(slip, tauResAct,slipVectorEstimate, xHatPlus(5,indexVector), estimateColor, slipVectorTrue, x(5,indexVector),trueColor)
         ylabel('Resistance Torque (N)')
         xlabel('slip ratio')
         xlim([0 100])
-        legend('Act1','Act2','Act3','True','Estimated','Location','SouthEast')
         hold on
     subplot(234)
-        plot( slip, RAct(:,1), slip, RAct(:,2), slip, RAct(:,3) )
+        plot( slip, RAct )
         ylabel('Resistance (N)')
         xlabel('slip ratio')
         hold on
     subplot(235)
-        plot(slip, sinkageAct(:,1), slip, sinkageAct(:,2), slip, sinkageAct(:,3),...
+        plot(slip, sinkageAct,...
             slip, maxSinkageIn*inch2meter*ones(numel(slip),1),'k:')
         xlabel('slip ratio')
         ylabel('sinkage (m)')
         hold on
     subplot(236)
-        plot(slip, zeros(numel(slip),1),'k:',slip, netTractionLoadMatTrue(:,1), slip, netTractionLoadMatTrue(:,2), slip, netTractionLoadMatTrue(:,3))
+        plot(slip, zeros(numel(slip),1),'k:',slip, netTractionLoadMatTrue)
         ylabel('Net Traction with PayLoad (N)')
         xlabel('slip ratio')        
 %     subplot(236)

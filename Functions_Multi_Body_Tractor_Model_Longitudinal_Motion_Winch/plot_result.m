@@ -149,8 +149,8 @@ end;
 %title('Friction Angle of Terrain')
 ylabel('North Position (meters)','interpreter','latex','fontsize',16)
 xlabel('East Position (meters)','interpreter','latex','fontsize',16)
-xlim([0 80])
-ylim([20 100])
+xlim([0 gridSizeXM])
+ylim([0 gridSizeYM])
 hold on
 
 figure(2)
