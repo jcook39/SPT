@@ -1,7 +1,14 @@
-function plot_traction_control( tractor, nConstantMT865, structTractionController, structDTKF, input, nTimeStep, timeStepS, figureNo )
+function plot_traction_control( tractor, nConstantMT865, structTractionController, structDTKF, input, nTimeParam, tractorNo, figureNo )
 
 % This function plots results from the traction controller implemented
 % through the ECU
+
+% ------------------- Unpack Simulation Time Paramters --------------------
+nTimeStep = nTimeParam.nTimeStep;
+timeStepS = nTimeParam.timeStepS;
+time = nTimeParam.time;
+indexVector = 1:nTimeStep;
+timeVector = (indexVector-1)*timeStepS;
 
 % ------------------- Unpack Tractor Parameters ---------------------------
 engineTorqueDataNM = nConstantMT865.engineTorqueDataNM;
@@ -50,9 +57,6 @@ gearNo = structTractionController.gearNo;
 gearShiftFlag = structTractionController.gearShiftFlag;
 gearShiftControlCountInt = structTractionController.gearShiftControlCountInt;
 
-% --------------- Create time Vector for plotting -------------------------
-indexVector = 1:nTimeStep;
-timeVector = (indexVector-1)*timeStepS;
 
 % ------- Plot Track Speed over allowable Track Speed in each GR ----------
 engineSpeedRangeMinRadPS = 1400*((2*pi)/60);
@@ -78,8 +82,8 @@ powerMat = repmat( enginePowerRangeW.' , 1 , 16 );
 
 
 % Plot 
-figure(figureNo+1)
-plot( trackSpeedMat, gearNoMat, omegaHat, usedGearNo, 'k:')
+% figure(figureNo+1)
+% plot( trackSpeedMat, gearNoMat, omegaHat, usedGearNo, 'k:')
 
 % --------------- line color for plot parameters --------------------------
 trueColor = 'b';
@@ -90,6 +94,7 @@ refColor = 'c';
 
 
 figure(figureNo)
+set(gcf,'numbertitle','off','name',['Terrian Tractor',num2str(tractorNo)])
 subplot(231)
     plot(timeVector, iref, refColor, timeVector, slip, trueColor,...
     timeVector, slipHat, estimatedColor, timeVector, slipHatSmooth, smoothColor)
@@ -111,13 +116,13 @@ subplot(236)
     ylabel('control off/on')
     
     
-figure(figureNo+2)
-subplot(311)
-    plot(timeVector,gearNo)
-subplot(312)
-    plot(timeVector, gearShiftFlag)
-subplot(313)
-    plot(timeVector, gearShiftControlCountInt)
+% figure(figureNo+2)
+% subplot(311)
+%     plot(timeVector,gearNo)
+% subplot(312)
+%     plot(timeVector, gearShiftFlag)
+% subplot(313)
+%     plot(timeVector, gearShiftControlCountInt)
 
 
 end

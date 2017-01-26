@@ -1,4 +1,4 @@
-function plot_result(tractor,inputMat,lineStyle,nConstantMT865,nConstantTerrain,nTimeStep,timeStepS,plotContour)
+function plot_result(tractor,inputMat,lineStyle,nConstantMT865,nConstantTerrain,nTimeParam,plotContour)
 
 %% Unpack Constants
 trackAreaM2 = nConstantMT865.trackAreaM2;
@@ -6,6 +6,10 @@ normalForceTrackN = nConstantMT865.normalForceTrackN;
 RsledN = nConstantMT865.RsledN;
 
 %% Create time Vector for plotting
+nTimeStep = nTimeParam.nTimeStep;
+timeStepS = nTimeParam.timeStepS;
+time = nTimeParam.time;
+
 indexVector = 1:nTimeStep;
 timeVector = (indexVector-1)*timeStepS;
 
@@ -126,7 +130,7 @@ dim2 = [0.6 0.3 0.4 0.57];
 str2 = 'Terrain 2';
 annotation('textbox',dim2,'String',str2,'FitBoxToText','on','linestyle','none','fontsize',16);
 
-tractorColor = 'y';
+tractorColor = lineStyle;
 for i=1:incVehicle:nTimeStep
   
     plot_tractor_on_map_longitudinal(tractor,i,nConstantMT865,tractorColor)

@@ -173,8 +173,8 @@ function [throttleControllerPID] = PID_F_Control(structTractionController, error
 sysControllerD = structTractionController.sysControllerD;
 sysControllerDTFnum = sysControllerD.num{:,:,gear,1};
 sysControllerDTFden = sysControllerD.den{:,:,gear,1};
-fprintf('a = %f %f %f \n',sysControllerDTFden)
-fprintf('b = %f %f %f \n',sysControllerDTFnum)
+%fprintf('a = %f %f %f \n',sysControllerDTFden)
+%fprintf('b = %f %f %f \n',sysControllerDTFnum)
 
 b0 = sysControllerDTFnum(1,1);
 b1 = sysControllerDTFnum(1,2);

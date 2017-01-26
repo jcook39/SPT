@@ -1,4 +1,4 @@
-function plot_DTKF_result(structDTKF, nConstantTerrain, nConstantMT865, nTimeStep, timeStepS, figureNo)
+function plot_DTKF_result(structDTKF, nConstantMT865, nTimeParam, figureNo)
 
 % --------------------- Estimated State Vector ----------------------------
 % xHat = [vHat omegaHat F_T,NetHat F_T,NetHatDot tau_ResHat tau_ResHatDot 
@@ -12,8 +12,20 @@ function plot_DTKF_result(structDTKF, nConstantTerrain, nConstantMT865, nTimeSte
 
 
 % ---------------- Create time Vector for plotting ------------------------
+nTimeStep = nTimeParam.nTimeStep;
+timeStepS = nTimeParam.timeStepS;
+time = nTimeParam.time;
+
 indexVector = 1:nTimeStep;
 timeVector = (indexVector-1)*timeStepS;
+
+% ----------------------- Unpack Tractor Parameters -----------------------
+rollingRadiusM = nConstantMT865.rollingRadiusM;
+massTractorKG = nConstantMT865.massTractorKG;
+massSledKG = nConstantMT865.massSledKG;
+RsledN = nConstantMT865.RsledN;
+gMPS2 = nConstantMT865.gMPS2;
+resCoeff = nConstantMT865.resCoeff;
 
 % ----------------------- Unpack DTKF structure ---------------------------
 x = structDTKF.x;
@@ -25,13 +37,11 @@ smoothedvHat = structDTKF.smoothedvHat;
 slipHat = structDTKF.slipHat;
 slipHatSmooth = structDTKF.slipHatSmooth;
 
-% ----------------------- Unpack Tractor Parameters -----------------------
-rollingRadiusM = nConstantMT865.rollingRadiusM;
-massTractorKG = nConstantMT865.massTractorKG;
-massSledKG = nConstantMT865.massSledKG;
-RsledN = nConstantMT865.RsledN;
-gMPS2 = nConstantMT865.gMPS2;
-resCoeff = nConstantMT865.resCoeff;
+slipVectorTrue = 100*(1-(x(1,indexVector)./(rollingRadiusM*x(2,indexVector))));
+slipVectorMeasure = 100*(1-(y(2,indexVector)./(rollingRadiusM*y(3,indexVector))));
+
+errorSlipHat = slipHat - slipVectorTrue;
+errorSlipHatSmooth = slipHatSmooth - slipVectorTrue;
 
 
 % ------------------------------ Plots ------------------------------------
@@ -42,76 +52,73 @@ estimateColor = 'r';
 measureColor = 'k.';
 smoothColor = 'g';
 
-figure(figureNo)
-set(gcf,'numbertitle','off','name','Discrete Time Kalman Filter Results')
-% Speed
-subplot(251)
-    h = plot(timeVector,x(1,indexVector),trueColor,timeVector,xHatPlus(1,indexVector),estimateColor,...
-        timeVector,y(2,indexVector),measureColor, timeVector, smoothedvHat, smoothColor);
-    set(h(1),'linewidth',lineWidthSize)
-    set(h(4),'linewidth',lineWidthSize)
-    ylabel('Vehicle Speed')
-    legend('True Value','Estimated Value','Measured Value','Location','SouthEast')
-subplot(256)
-    semilogy(timeVector,abs(xError(1,indexVector)),'r')
-    ylabel('Vehicle Speed Estimate Error')
-% Driver Speed
-subplot(252)
-    h = plot(timeVector,x(2,indexVector),trueColor,timeVector,xHatPlus(2,indexVector),estimateColor,timeVector,y(3,indexVector),measureColor);
-    set(h(1),'linewidth',lineWidthSize)
-    ylabel('Driver Speed')
-subplot(257)
-    semilogy(timeVector,abs(xError(1,indexVector)),'r')
-    ylabel('Driver Speed Estimate Error')
-%F_T,Net
-subplot(253)
-    h = plot(timeVector,x(3,indexVector),trueColor,timeVector,xHatPlus(3,indexVector),estimateColor);
-    set(h(1),'linewidth',lineWidthSize)
-    ylabel('Net Track Force')
-subplot(258)
-    semilogy(timeVector,abs(xError(3,indexVector)),'r')
-    ylabel('Net Track Force Estimate Error')
-% tauRes
-subplot(254)
-    h = plot(timeVector,x(5,indexVector),trueColor,timeVector,xHatPlus(5,indexVector),estimateColor);
-    set(h(1),'linewidth',lineWidthSize)
-    ylabel('Resistive Torque')
-subplot(259)
-    semilogy(timeVector,abs(xError(5,indexVector)),'r')
-    ylabel('Resistive Torque Estimate Error')
-% R_S
-subplot(255)
-    h = plot(timeVector,x(7,indexVector),trueColor,timeVector,xHatPlus(7,indexVector),estimateColor,timeVector,y(4,indexVector),measureColor);
-    set(h(1),'linewidth',lineWidthSize)
-    ylabel('Drawbar Load Estimate Error')
-subplot(2,5,10)
-    semilogy(timeVector,abs(xError(7,indexVector)),'r')
-    ylabel('Drawbar Load Estimate Error')
+% figure(figureNo)
+% set(gcf,'numbertitle','off','name','Discrete Time Kalman Filter Results')
+% % Speed
+% subplot(251)
+%     h = plot(timeVector,x(1,indexVector),trueColor,timeVector,xHatPlus(1,indexVector),estimateColor,...
+%         timeVector,y(2,indexVector),measureColor, timeVector, smoothedvHat, smoothColor);
+%     set(h(1),'linewidth',lineWidthSize)
+%     set(h(4),'linewidth',lineWidthSize)
+%     ylabel('Vehicle Speed')
+%     legend('True Value','Estimated Value','Measured Value','Location','SouthEast')
+% subplot(256)
+%     semilogy(timeVector,abs(xError(1,indexVector)),'r')
+%     ylabel('Vehicle Speed Estimate Error')
+% % Driver Speed
+% subplot(252)
+%     h = plot(timeVector,x(2,indexVector),trueColor,timeVector,xHatPlus(2,indexVector),estimateColor,timeVector,y(3,indexVector),measureColor);
+%     set(h(1),'linewidth',lineWidthSize)
+%     ylabel('Driver Speed')
+% subplot(257)
+%     semilogy(timeVector,abs(xError(1,indexVector)),'r')
+%     ylabel('Driver Speed Estimate Error')
+% %F_T,Net
+% subplot(253)
+%     h = plot(timeVector,x(3,indexVector),trueColor,timeVector,xHatPlus(3,indexVector),estimateColor);
+%     set(h(1),'linewidth',lineWidthSize)
+%     ylabel('Net Track Force')
+% subplot(258)
+%     semilogy(timeVector,abs(xError(3,indexVector)),'r')
+%     ylabel('Net Track Force Estimate Error')
+% % tauRes
+% subplot(254)
+%     h = plot(timeVector,x(5,indexVector),trueColor,timeVector,xHatPlus(5,indexVector),estimateColor);
+%     set(h(1),'linewidth',lineWidthSize)
+%     ylabel('Resistive Torque')
+% subplot(259)
+%     semilogy(timeVector,abs(xError(5,indexVector)),'r')
+%     ylabel('Resistive Torque Estimate Error')
+% % R_S
+% subplot(255)
+%     h = plot(timeVector,x(7,indexVector),trueColor,timeVector,xHatPlus(7,indexVector),estimateColor,timeVector,y(4,indexVector),measureColor);
+%     set(h(1),'linewidth',lineWidthSize)
+%     ylabel('Drawbar Load Estimate Error')
+% subplot(2,5,10)
+%     semilogy(timeVector,abs(xError(7,indexVector)),'r')
+%     ylabel('Drawbar Load Estimate Error')
 
 
 resistanceSledEstimateN = xHatPlus(7,indexVector) - massSledKG*((xHatPlus(3,indexVector) - xHatPlus(7,indexVector))/massTractorKG);     
 resistanceCoefficientEstimate = resistanceSledEstimateN./(massSledKG*gMPS2);
 
-slipVectorTrue = 100*(1-(x(1,indexVector)./(rollingRadiusM*x(2,indexVector))));
-slipVectorMeasure = 100*(1-(y(2,indexVector)./(rollingRadiusM*y(3,indexVector))));
 figure(figureNo+1)
-set(gcf,'numbertitle','off','name','Slip-Drawbar Force Estimation')
 subplot(221)
-    plot(timeVector,slipVectorTrue,trueColor,timeVector,slipHat,estimateColor,...
-        timeVector,slipVectorMeasure,measureColor,timeVector,slipHatSmooth,smoothColor)
+    h = plot(timeVector,slipVectorTrue,trueColor,timeVector,slipHat,estimateColor,...
+        timeVector,slipVectorMeasure,measureColor,timeVector,slipHatSmooth,smoothColor);
     set(h(1),'linewidth',lineWidthSize)
     xlabel('time (seconds)')
     ylabel('slip')
     ylim([0 100])
-    legend('True Value','Estimated Value','Measured Value')
+    legend('True Value','Estimated Value','Measured Value','Smoothed Estimated Value')
     grid on
-subplot(222)
-    plot3(timeVector,slipHat,xHatPlus(7,indexVector),estimateColor)
+subplot(223)
+    plot(timeVector,abs(errorSlipHat),estimateColor,timeVector,abs(errorSlipHatSmooth),smoothColor)
     zlabel('Estimated Drawbar Force')
     ylabel('Estimated Slip')
     xlabel('time (seconds)')
-    ylim([0 100])
-subplot(223)
+    ylim([0 10])
+subplot(222)
     plot(timeVector,resistanceSledEstimateN,estimateColor,timeVector,RsledN*ones(numel(timeVector)),trueColor)
     xlabel('time (seconds)')
     ylabel('Resistance Sled Estimate (N)')

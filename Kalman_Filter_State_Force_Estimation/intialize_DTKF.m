@@ -1,4 +1,4 @@
-function [ structDTKF ] = intialize_DTKF(processNoiseVariance, nConstantMT865, nTimeStep, timeStepS)
+function [ structDTKF ] = intialize_DTKF(processNoiseVariance, nConstantMT865, nTimeParam)
 % This function intializes a linear discrete time kalman filter
 %
 % --------------------- Estimated State Vector ----------------------------
@@ -11,6 +11,10 @@ function [ structDTKF ] = intialize_DTKF(processNoiseVariance, nConstantMT865, n
 % -------------------- Measurement Vector ---------------------------------
 % y = [vDot v omega DB].'
 %
+% ------------------- Unpack Simulation Time Paramters --------------------
+nTimeStep = nTimeParam.nTimeStep;
+timeStepS = nTimeParam.timeStepS;
+
 % ------- Covariance Matrices for Process and Measurement Noise -----------
 filterTimeStepS = timeStepS;
 measurementNoiseVariance = [0.1 0.003 2.8521E-4 2.6795E7].'; % v in Optimal State Estimation by Simon

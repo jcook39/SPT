@@ -39,7 +39,7 @@ structTractionController.throttleControllerPID = zeros(nTimeStep,1);
 
 structTractionController.tractionControlIsOn = zeros(nTimeStep,1);
 
-structTractionController.gearShiftControlUpdateRateHz = 1;
+structTractionController.gearShiftControlUpdateRateHz = 0.5;
 structTractionController.gearShiftControlIsOn = zeros(nTimeStep,1);
 structTractionController.gearShiftControlCountInt = zeros(nTimeStep,1);
 structTractionController.gearShiftControlEngineRPMTargetRPM = 1700;
