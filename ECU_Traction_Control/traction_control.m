@@ -8,8 +8,8 @@ nGR = nConstantMT865.nGearRatio;
 FD = nConstantMT865.finalDriveRatio;
 
 % ------------------ Unpack Needed Tractor Inputs -------------------------
-gear = input(2);
-GR = nGR(gear);
+gearNoOld = input(2);
+GR = nGR(gearNoOld);
 
 % ------------------- Unpack Needed Tractor States ------------------------
 x = tractor.state;
@@ -77,17 +77,17 @@ if tractionControlIsOn
     % ------------------ Gear Shift Controller ----------------------------
     [gearShiftControlCountInt, gearShiftFlag] = controller_counter_func(gearShiftControlUpdateRateHz, gearShiftControlCountInt, timeStepS);
     if gearShiftFlag
-        [ gearNo ] = gear_shift_controller( structTractionController, omegaRef, nConstantMT865 );
-        structTractionController.gearNo(timeStepNo,1) = gearNo;
-        input(2) = gearNo;
+        [ gearNoNew ] = gear_shift_controller( structTractionController, omegaRef, gearNoOld, nConstantMT865 );
+        structTractionController.gearNo(timeStepNo,1) = gearNoNew;
+        input(2) = gearNoNew;
     else
         structTractionController.gearNo(timeStepNo,1) = structTractionController.gearNo(timeStepNo-1,1);
-        gearNo = structTractionController.gearNo(timeStepNo,1);
-        if gearNo == 0
-            gearNo = gear;
-            input(2) = gear;
+        gearNoNew = structTractionController.gearNo(timeStepNo,1);
+        if gearNoNew == 0
+            gearNoNew = gearNoOld;
+            input(2) = gearNoOld;
         else
-            input(2) = gearNo;
+            input(2) = gearNoNew;
         end
     end
     
@@ -103,7 +103,7 @@ if tractionControlIsOn
     %Kp = structTractionController.KpGR(gearNo);
     %Ki = structTractionController.KiGR(gearNo);
     errorOmega = omegaRef - omegaHat;
-    [throttleControllerPID] = PID_F_Control(structTractionController, errorOmega, gear, timeStepNo);
+    [throttleControllerPID] = PID_F_Control(structTractionController, errorOmega, gearNoOld, timeStepNo);
     errorOmegaIntegrated = errorOmegaIntegrated + errorOmega*timeStepS;
     throttleControllerPIDFF = throttleFeedForward + throttleControllerPID;
     if throttleControllerPIDFF > 1 
@@ -120,17 +120,17 @@ elseif ~tractionControlIsOn
     % ------------------ Gear Shift Controller ----------------------------
     [gearShiftControlCountInt, gearShiftFlag] = controller_counter_func(gearShiftControlUpdateRateHz, gearShiftControlCountInt, timeStepS);
     if gearShiftFlag
-        [ gearNo ] = gear_shift_controller( structTractionController, omegaHat, nConstantMT865 );
-        structTractionController.gearNo(timeStepNo,1) = gearNo;
-        input(2) = gearNo;
+        [ gearNoNew ] = gear_shift_controller( structTractionController, omegaHat, gearNoOld, nConstantMT865 );
+        structTractionController.gearNo(timeStepNo,1) = gearNoNew;
+        input(2) = gearNoNew;
     else
         structTractionController.gearNo(timeStepNo,1) = structTractionController.gearNo(timeStepNo-1,1);
-        gearNo = structTractionController.gearNo(timeStepNo,1);
-        if gearNo == 0
-            gearNo = gear;
-            input(2) = gear;
+        gearNoNew = structTractionController.gearNo(timeStepNo,1);
+        if gearNoNew == 0
+            gearNoNew = gearNoOld;
+            input(2) = gearNoOld;
         else
-            input(2) = gearNo;
+            input(2) = gearNoNew;
         end
     end
     

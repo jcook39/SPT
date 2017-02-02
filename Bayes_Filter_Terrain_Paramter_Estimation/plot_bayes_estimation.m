@@ -106,16 +106,23 @@ subplot(236)
     hold on
     
     
+% if strcmp(histString,'plotHist')
+% figure(figureNo+1)
+% subplot(121)
+%     histogram(peakSlipNoLoadHypotheses,[0:40])
+%     ylabel('Count No')
+%     xlabel('Peak Traction Slip Value No Payload')
+% subplot(122)
+%     histogram(peakSlipLoadHypotheses,[0:40])
+%     ylabel('Count No')
+%     xlabel('Peak Traction Slip Value with Payload')
+% end
+
 if strcmp(histString,'plotHist')
 figure(figureNo+1)
-subplot(121)
-    histogram(peakSlipNoLoadHypotheses,[0:40])
+    histogram(peakSlipNoLoadHypotheses,[0:45])
     ylabel('Count No')
-    xlabel('Peak Traction Slip Value No Payload')
-subplot(122)
-    histogram(peakSlipLoadHypotheses,[0:40])
-    ylabel('Count No')
-    xlabel('Peak Traction Slip Value with Payload')
+    xlabel('Peak Traction Slip')
 end
     
 

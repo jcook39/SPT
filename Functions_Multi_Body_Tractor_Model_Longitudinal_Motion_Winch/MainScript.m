@@ -18,14 +18,14 @@ nConstantMT865 = initialize_constant_tractors_parameters(resCoeff,bladderNo);
 
 % --------------------------- Tractor1 ------------------------------------
 nConstantTerrain.indTrac(:,1) = [1:3].';
-nConstantTerrain.nLocX(1:3,1:2) = [0 30; 30 120; 120 200]; 
+nConstantTerrain.nLocX(1:3,1:2) = [0 30; 30 130; 130 300]; 
 nConstantTerrain.nLocY(1:3,1:2) = [0 10; 0 10; 0 10];
 % Terrain Vectors for each boundry
-nConstantTerrain.cohesion(1:3,1) = [6.1 3 6.3].'; 
+nConstantTerrain.cohesion(1:3,1) = [6.1 3 8].'; 
 nConstantTerrain.frictionAngle(1:3,1) = [20 18.1 20].';
 nConstantTerrain.n(1:3,1) = [1 1 1].';
 nConstantTerrain.keq(1:3,1) = [500 333 500].'; % Units in Meters (Keq) - does not seem to effect peak traction pt
-nConstantTerrain.K(1:3,1) = [2 0.7 4].';
+nConstantTerrain.K(1:3,1) = [2 0.7 2].';
 nConstantTerrain.S(1:3,1) = [0.6/33 0.8/33 0.6/33].';
 
 % --------------------------- Tractor2 ------------------------------------
@@ -33,10 +33,10 @@ nConstantTerrain.indTrac(:,2) = [4:6].';
 nConstantTerrain.nLocX(4:6,1:2) = nConstantTerrain.nLocX(1:3,1:2); 
 nConstantTerrain.nLocY(4:6,1:2) = nConstantTerrain.nLocY(1:3,1:2) + 10;
 % Terrain Vectors for each boundry
-nConstantTerrain.cohesion(4:6,1) = [6.1 5.2 6.3].'; 
+nConstantTerrain.cohesion(4:6,1) = [6.1 3.9 6.3].'; 
 nConstantTerrain.frictionAngle(4:6,1) = [20 17.1 20].';
 nConstantTerrain.n(4:6,1) = [1 1 1].';
-nConstantTerrain.keq(4:6,1) = [500 280 500].'; % Units in Meters (Keq) - does not seem to effect peak traction pt
+nConstantTerrain.keq(4:6,1) = [500 470 500].'; % Units in Meters (Keq) - does not seem to effect peak traction pt
 nConstantTerrain.K(4:6,1) = [2 2.7 4].';
 nConstantTerrain.S(4:6,1) = [0.6/33 0.9/33 0.6/33].';
 
@@ -57,12 +57,12 @@ nConstantTerrain.indTrac(:,4) = [10:12].';
 nConstantTerrain.nLocX(10:12,1:2) = nConstantTerrain.nLocX(1:3,1:2); 
 nConstantTerrain.nLocY(10:12,1:2) = nConstantTerrain.nLocY(7:9,1:2) + 10;
 % Terrain Vectors for each boundry
-nConstantTerrain.cohesion(10:12,1) = [6.1 6 6.3].'; 
+nConstantTerrain.cohesion(10:12,1) = [6.1 5.7 6.3].'; 
 nConstantTerrain.frictionAngle(10:12,1) = [20 17.1 20].';
 nConstantTerrain.n(10:12,1) = [1 1 1].';
 nConstantTerrain.keq(10:12,1) = [500 375 500].'; % Units in Meters (Keq) - does not seem to effect peak traction pt
-nConstantTerrain.K(10:12,1) = [2 6.7 4].';
-nConstantTerrain.S(10:12,1) = [0.6/33 0.8/33 0.6/33].';
+nConstantTerrain.K(10:12,1) = [2 6.8 4].';
+nConstantTerrain.S(10:12,1) = [0.6/33 0.9/33 0.6/33].';
 
 % --------------------------- Tractor5 ------------------------------------
 indexTerrain5 = [13:15].';
@@ -70,17 +70,17 @@ nConstantTerrain.indTrac(:,5) = [13:15].';
 nConstantTerrain.nLocX(indexTerrain5,1:2) = nConstantTerrain.nLocX(1:3,1:2); 
 nConstantTerrain.nLocY(indexTerrain5,1:2) = nConstantTerrain.nLocY(10:12,1:2) + 10;
 % Terrain Vectors for each boundry
-nConstantTerrain.cohesion(indexTerrain5,1) = [6.1 6 6.3].'; 
-nConstantTerrain.frictionAngle(indexTerrain5,1) = [20 18.1 20].';
+nConstantTerrain.cohesion(indexTerrain5,1) = [6.1 6.1 6.3].'; 
+nConstantTerrain.frictionAngle(indexTerrain5,1) = [20 15.3 20].';
 nConstantTerrain.n(indexTerrain5,1) = [1 1 1].';
-nConstantTerrain.keq(indexTerrain5,1) = [500 250 500].'; % Units in Meters (Keq) - does not seem to effect peak traction pt
+nConstantTerrain.keq(indexTerrain5,1) = [500 490 500].'; % Units in Meters (Keq) - does not seem to effect peak traction pt
 nConstantTerrain.K(indexTerrain5,1) = [2 7 4].';
 nConstantTerrain.S(indexTerrain5,1) = [0.6/33 0.8/33 0.6/33].';
 
 nConstantTerrain.terrainActual = [nConstantTerrain.cohesion.'; nConstantTerrain.frictionAngle.'; ...
     nConstantTerrain.n.'; nConstantTerrain.keq.'; nConstantTerrain.K.'; nConstantTerrain.S.'];
 % Grid Specifications
-nConstantTerrain.gridSizeXM = 200;
+nConstantTerrain.gridSizeXM = 300;
 nConstantTerrain.gridSizeYM = 50;
 nConstantTerrain.gridResolutionM = 0.1;
 nConstantTerrain.Mode = 'Region';
@@ -88,7 +88,7 @@ nConstantTerrain = generate_terrain(nConstantTerrain,nConstantMT865);
 
 %% --------------- Set Simulation Integration Time Steps ------------------
 nTimeParam.timeStepS = 0.05;
-nTimeParam.simulationTime = 75;
+nTimeParam.simulationTime = 100;
 nTimeParam.time = [0:nTimeParam.timeStepS:nTimeParam.simulationTime].'; % Time array based on sample time and total simulation time
 nTimeParam.nTimeStep = size(nTimeParam.time,1); % Total number of time steps
 
@@ -120,6 +120,7 @@ structRBE.terrainHypDefn = 1;
 structRBE.terrainHypDefkeq = 100:100:500;
 structRBE.terrainHypDefK = 0.5:1:3.5;
 structRBE.terrainHypDefS = 0.6/33;
+structRBE.FlagRBEisOn = 1;
 structRBE_1 = structRBE;
 structRBE_1.covariance = [5e8 5e8];
 structRBE_1.normalizeString = 'noNormalize';
@@ -141,7 +142,7 @@ structRBE_3 = terrain_hypothesis(structRBE_3, nConstantMT865, nTimeParam.nTimeSt
 controlArchitecture.structRBE = structRBE_3;
 
 % Traction Controller
-structTractionController = initialize_TractionController( 0.3, 0.15, 1E-6, nConstantMT865, nTimeParam.nTimeStep);
+structTractionController = initialize_TractionController( 0.27, 0.15, 1E-6, 1E-6, nConstantMT865, nTimeParam.nTimeStep);
 controlArchitecture.structTractionController = structTractionController;
 
 
@@ -154,6 +155,7 @@ tractor1Y = 5; % longitudinal position (m)
 MT865_1 = initialize_MT865_structure( tractor1X, tractor1Y, 0, nConstantMT865, nConstantTerrain, inputMat1(1,:), 'pseudo_rest');
 tractor1(1:nTimeParam.nTimeStep) = MT865_1;
 controlArchitecture1 = controlArchitecture;
+%controlArchitecture1.structTractionController.FlagTCisOn = 0;
 
 % Tractor 2
 tractor2X = 14; % lateral position (m)
@@ -198,14 +200,15 @@ controlArchitecture5 = controlArchitecture;
 [tractor4, controlArchitecture4, inputMat4] = tractor_simulate(tractor4, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture4);
 [tractor5, controlArchitecture5, inputMat5] = tractor_simulate(tractor5, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture5);
 
-%% ---------------------------- Plot Result -------------------------------
+% ---------------------------- Plot Result -------------------------------
 plot_result(tractor1,inputMat1,'r',nConstantMT865,nConstantTerrain, nTimeParam,1)
 plot_result(tractor2,inputMat2,'b',nConstantMT865,nConstantTerrain, nTimeParam,0)
 plot_result(tractor3,inputMat3,'g',nConstantMT865,nConstantTerrain, nTimeParam,0)
 plot_result(tractor4,inputMat4,'c',nConstantMT865,nConstantTerrain, nTimeParam,0)
 plot_result(tractor5,inputMat5,'m',nConstantMT865,nConstantTerrain, nTimeParam,0)
 
-% plot_DTKF_result(controlArchitecture1.structDTKF, nConstantMT865, nTimeParam, 305);
+controlArchitecture1.structDTKF.plotSmooth = 'noPlotSmooth';
+%plot_DTKF_result(controlArchitecture1.structDTKF, 1, 1:2,nConstantTerrain, nConstantMT865, nTimeParam, 305);
 
 
 plot_terrain_curves(controlArchitecture1.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 1, 502)
@@ -213,7 +216,6 @@ plot_terrain_curves(controlArchitecture2.structDTKF, nConstantMT865, nConstantTe
 plot_terrain_curves(controlArchitecture3.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 3, 510)
 plot_terrain_curves(controlArchitecture4.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 4, 514)
 plot_terrain_curves(controlArchitecture5.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 5, 518)
-
 
 
 plot_terrain_hypothesis_2(controlArchitecture1.structRBE, controlArchitecture1.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 522)
@@ -227,5 +229,5 @@ plot_bayes_estimation(tractor5, controlArchitecture5.structRBE, nConstantMT865, 
 plot_traction_control( tractor1, nConstantMT865, controlArchitecture1.structTractionController, controlArchitecture1.structDTKF, inputMat1, nTimeParam, 1, 800)
 plot_traction_control( tractor2, nConstantMT865, controlArchitecture2.structTractionController, controlArchitecture2.structDTKF, inputMat2, nTimeParam, 2, 802)
 plot_traction_control( tractor3, nConstantMT865, controlArchitecture3.structTractionController, controlArchitecture3.structDTKF, inputMat3, nTimeParam, 3, 804)
-plot_traction_control( tractor4, nConstantMT865, controlArchitecture4.structTractionController, controlArchitecture4.structDTKF, inputMat4, nTimeParam, 4, 806 )
-plot_traction_control( tractor5, nConstantMT865, controlArchitecture5.structTractionController, controlArchitecture5.structDTKF, inputMat5, nTimeParam, 5, 808 )
+plot_traction_control( tractor4, nConstantMT865, controlArchitecture4.structTractionController, controlArchitecture4.structDTKF, inputMat4, nTimeParam, 4, 806)
+plot_traction_control( tractor5, nConstantMT865, controlArchitecture5.structTractionController, controlArchitecture5.structDTKF, inputMat5, nTimeParam, 5, 808)

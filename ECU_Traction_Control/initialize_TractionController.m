@@ -1,4 +1,4 @@
-function structTractionController = initialize_TractionController(KpAll, KiAll, KdAll, nConstantMT865, nTimeStep)
+function structTractionController = initialize_TractionController(KpAll, KiAll, KdAll, Tf, nConstantMT865, nTimeStep)
 
 % --------------- Unpack Tractor Needed Parameters ------------------------
 nGR = nConstantMT865.nGearRatio;
@@ -13,10 +13,6 @@ KdGR = KdAll./nGR;
 
 % ------------------- Controller Initilization ----------------------------
 % PIDF
-% KpGR = 0.4;
-% KiGR = 0.2;
-% KdGR = 0.1;
-Tf = 0.000001;
 
 ControllerC = pid(KpGR(1:16).', KiGR(1:16).', KdGR(1:16).', Tf);
 controllerSampleTime = 0.05; % 20 Hz;
@@ -47,5 +43,8 @@ structTractionController.gearNo = zeros(nTimeStep,1);
 
 structTractionController.gearShiftFlag = zeros(nTimeStep,1);
 structTractionController.sysControllerD = sysControllerD;
+
+% --------------- Traction Control is On ----------------------------------
+structTractionController.FlagTCisOn = 1;
 
 end

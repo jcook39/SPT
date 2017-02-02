@@ -1,4 +1,4 @@
-function [ gearNo ] = gear_shift_controller( structTractionController, omegaHat, nConstantMT865 )
+function [ gearNoNew ] = gear_shift_controller( structTractionController, omegaHat, gearNoOld, nConstantMT865 )
 % 
 
 % ------------------ Unpack Needed Controller Parameters ------------------
@@ -21,9 +21,16 @@ lumpedGR = nGR*FD;
 engineSpeedRadPSnGR = omegaHat*lumpedGR; % Engine Speed in each gear ratio for the track reference speed
 diffHold = (engineSpeedRadPSnGR - gearShiftControlEngineRPMTargetRadPS).^2; % difference between reference and actual for each gear
 indexOptimalGR = min(diffHold) == diffHold;
-gearNo = nGearNo(indexOptimalGR);
+gearNoNew = nGearNo(indexOptimalGR);
 
-% NEEDS TO BE LOGIC SO THAT NO MORE THAN A CHANGE OF 1 GEAR TAKES PLACE!
+% Ensure only 1 gear shift takes place
+diffGearNo = gearNoNew - gearNoOld;
+gearShiftMoreThanOne = (abs(diffGearNo) > 1);
+if gearShiftMoreThanOne
+    gearNoNew = gearNoOld + sign(diffGearNo);
+end
+
+
 
 end
 
