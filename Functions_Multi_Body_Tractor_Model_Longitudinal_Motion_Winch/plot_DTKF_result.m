@@ -1,4 +1,4 @@
-function plot_DTKF_result(structDTKF, nConstantMT865, nTimeParam, figureNo)
+function plot_DTKF_result(structDTKF, tractorNo, terrainIndex, nConstantTerrain, nConstantMT865, nTimeParam, figureNo)
 
 % --------------------- Estimated State Vector ----------------------------
 % xHat = [vHat omegaHat F_T,NetHat F_T,NetHatDot tau_ResHat tau_ResHatDot 
@@ -18,6 +18,7 @@ time = nTimeParam.time;
 
 indexVector = 1:nTimeStep;
 timeVector = (indexVector-1)*timeStepS;
+simulationTime = nTimeParam.simulationTime;
 
 % ----------------------- Unpack Tractor Parameters -----------------------
 rollingRadiusM = nConstantMT865.rollingRadiusM;
@@ -43,12 +44,15 @@ slipVectorMeasure = 100*(1-(y(2,indexVector)./(rollingRadiusM*y(3,indexVector)))
 errorSlipHat = slipHat - slipVectorTrue;
 errorSlipHatSmooth = slipHatSmooth - slipVectorTrue;
 
+% ------------------------- Terrain ---------------------------------------
+terrainActual = nConstantTerrain.terrainActual;
 
 % ------------------------------ Plots ------------------------------------
 lineWidthSize = 2;
 
 trueColor = 'b';
 estimateColor = 'r';
+estimateColorDot = 'r.';
 measureColor = 'k.';
 smoothColor = 'g';
 
@@ -127,7 +131,12 @@ subplot(224)
     xlabel('time seconds')
     ylabel('Sled Resistance Coefficient')
     
-fontLabel = 18;    
+if ~strcmp(structDTKF.plotSmooth, 'plotSmooth') 
+    smoothedvHat = NaN*smoothedvHat;
+    slipHatSmooth = NaN*slipHatSmooth;
+end
+    
+fontLabel = 14;    
 figure(figureNo+2)
 subplot(321)
     h = plot(timeVector,x(1,indexVector),trueColor,timeVector,xHatPlus(1,indexVector),estimateColor,...
@@ -136,13 +145,22 @@ subplot(321)
     set(h(4),'linewidth',lineWidthSize)
     ylabel('Vehicle Speed, $v_T$ (m/s)','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
-    legend('True Value','Estimated Value','Measured Value','Location','NorthEast')
+    set(gca,'FontSize',fontLabel,'FontName','Times New Roman')
+    set(gca,'xlim',[0 simulationTime])
+    %if strcmp(structDTKF.plotSmooth, 'plotSmooth')
+    %    legend('True Value','Estimated Value','Measured Value','Smoothed Estimated Value','Location','NorthEast')
+    %else
+    %    legend('True Value','Estimated Value','Measured Value','Location','NorthEast')
+    %end
     grid on
 subplot(322)    
     h = plot(timeVector,x(2,indexVector),trueColor,timeVector,xHatPlus(2,indexVector),estimateColor,timeVector,y(3,indexVector),measureColor);
     set(h(1),'linewidth',lineWidthSize)
     ylabel('Driver Speed, $\dot{\varphi}$ (rad/s)','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
+    set(gca,'yaxislocation','right');
+    set(gca,'FontSize',fontLabel,'FontName','Times New Roman')
+    set(gca,'xlim',[0 simulationTime])
     ylim([0 4])
     grid on
 subplot(323)    
@@ -153,28 +171,63 @@ subplot(323)
     xlabel('time (seconds)')
     ylabel('slip ratio, i (\%)','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
+    set(gca,'FontSize',fontLabel,'FontName','Times New Roman')
+    set(gca,'xlim',[0 simulationTime])
     ylim([-10 100])
     %legend('True Value','Estimated Value','Measured Value')
     grid on
 subplot(324)    
-    h = plot(timeVector,x(3,indexVector),trueColor,timeVector,xHatPlus(3,indexVector),estimateColor);
+    h = plot(timeVector,x(3,indexVector)./1000,trueColor,timeVector,xHatPlus(3,indexVector)./1000,estimateColor);
     set(h(1),'linewidth',lineWidthSize)
-    ylabel('Net Track Force, $F_{Net}$ (N)','interpreter','latex','fontsize',fontLabel)
+    ylabel('Net Track Force, $F_{Net}$ (kN)','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
+    set(gca,'yaxislocation','right');
+    set(gca,'FontSize',fontLabel,'FontName','Times New Roman')
+    set(gca,'xlim',[0 simulationTime])
     grid on
 subplot(325)    
-    h = plot(timeVector,x(5,indexVector),trueColor,timeVector,xHatPlus(5,indexVector),estimateColor);
+    h = plot(timeVector,x(5,indexVector)./1000,trueColor,timeVector,xHatPlus(5,indexVector)./1000,estimateColor);
     set(h(1),'linewidth',lineWidthSize)
-    ylabel('Resistive Torque, $\tau_{Res}$ (Nm)','interpreter','latex','fontsize',fontLabel)
+    ylabel('Resistive Torque, $\tau_{Res}$ (kNm)','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
-    ylim([0 1.5e5])
+    set(gca,'FontSize',fontLabel,'FontName','Times New Roman')
+    set(gca,'xlim',[0 simulationTime])
     grid on
 subplot(326)
-    h = plot(timeVector,x(7,indexVector),trueColor,timeVector,xHatPlus(7,indexVector),estimateColor,timeVector,y(4,indexVector),measureColor);
+    h = plot(timeVector,x(7,indexVector)./1000,trueColor,timeVector,xHatPlus(7,indexVector)./1000,estimateColor,...
+        timeVector,y(4,indexVector)./1000,measureColor);
     set(h(1),'linewidth',lineWidthSize)
-    ylabel('Drawbar Load Estimate, $DB$ (N) ','interpreter','latex','fontsize',fontLabel)
+    ylabel('Drawbar Load Estimate, $DB$ (kN) ','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
+    set(gca,'yaxislocation','right');
+    set(gca,'FontSize',fontLabel,'FontName','Times New Roman')
+    set(gca,'xlim',[0 simulationTime])
     grid on
     
+    
+slip = 0.01:1.5:100;
+
+nTerrain = numel(terrainIndex);
+for i = 1:nTerrain
+    [F_TNetMat(:,i),F(:,i), R(:,i), tauRes(:,i), sinkage(:,i)] = net_track_force(terrainActual(:,i),nConstantMT865,slip);
+                 
+end     
+    
+figure(figureNo+4)
+subplot(121)
+    plot(slip,F_TNetMat./1000,'k',slipHat,xHatPlus(3,indexVector)./1000,estimateColorDot)
+    set(gca,'xlim',[0 100],'ylim',[0 120])
+    set(gca,'FontSize',fontLabel,'FontName','Times New Roman')
+    ylabel('Net Track Force, $F_{Net}$ (kN)','interpreter','latex','fontsize',fontLabel)
+    xlabel('slip ratio, i (\%)','interpreter','latex','fontsize',fontLabel)
+
+subplot(122)
+    plot(slip,tauRes./1000,'k',slipHat,xHatPlus(5,indexVector)./1000,estimateColorDot);
+    set(gca,'xlim',[0 100],'ylim',[0 100])
+    set(gca,'FontSize',fontLabel,'FontName','Times New Roman')
+    ylabel('Resistive Torque, $\tau_{Res}$ (kNm)','interpreter','latex','fontsize',fontLabel)
+    xlabel('slip ratio, i (\%)','interpreter','latex','fontsize',fontLabel)
+
+
     
 end

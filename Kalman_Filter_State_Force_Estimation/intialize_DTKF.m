@@ -92,11 +92,14 @@ structDTKF.Koffline = Koffline;
 structDTKF.smootherAd = smootherAd;
 structDTKF.smootherBd = smootherBd;
 structDTKF.smoothedvHat = zeros(1,nTimeStep);
+structDTKF.plotSmooth = 'plotSmooth';
 
 % Augmented State/slip Estimates
 structDTKF.slipHat = zeros(1,nTimeStep);
 structDTKF.slipHatSmooth = zeros(1,nTimeStep);
 
+% Kalman Filter is on
+structDTKF.FlagDTKFisOn = 1;
 
 end
 

@@ -123,12 +123,12 @@ plot(X,Y,lineStyle)
 hold on
 plot(X,Y,lineStyle)
 hold on
-dim1 = [0.2 0.3 0.28 0.57];
-str1 = 'Terrain 1';
-annotation('textbox',dim1,'String',str1,'FitBoxToText','on','linestyle','none','fontsize',16);
-dim2 = [0.6 0.3 0.4 0.57];
-str2 = 'Terrain 2';
-annotation('textbox',dim2,'String',str2,'FitBoxToText','on','linestyle','none','fontsize',16);
+% dim1 = [0.2 0.3 0.28 0.57];
+% str1 = 'Terrain 1';
+% annotation('textbox',dim1,'String',str1,'FitBoxToText','on','linestyle','none','fontsize',16);
+% dim2 = [0.6 0.3 0.4 0.57];
+% str2 = 'Terrain 2';
+% annotation('textbox',dim2,'String',str2,'FitBoxToText','on','linestyle','none','fontsize',16);
 
 tractorColor = lineStyle;
 for i=1:incVehicle:nTimeStep
@@ -193,6 +193,48 @@ xlabel('longitudinal position (m)')
 xlim([0 200])
 ylim([0 100])
 hold on
+
+font = 16;
+row1000 = 3;
+col1000 = 2;
+figure(1000)
+subplot(row1000,col1000,1)
+    plot(timeVector,X(indexVector),lineStyle)
+    ylabel('$X\hspace{2mm}(m)$','interpreter','latex','fontname','timesnewroman','fontsize',font)
+    xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    hold on
+subplot(row1000,col1000,2)
+    plot(timeVector,vx(indexVector),lineStyle)
+    ylabel('$v_T\hspace{2mm}(m/s)$','interpreter','latex','fontname','timesnewroman','fontsize',font)
+    xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    set(gca,'yaxislocation','right');
+    hold on
+subplot(row1000,col1000,3)
+    plot(timeVector,engSpdRadPS(indexVector).*((60)/(2*pi)),lineStyle)
+    ylim([1000 2300])
+    ylabel('$\Omega_E\hspace{2mm}(RPM)$','interpreter','latex','fontname','timesnewroman','fontsize',font)
+    xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    hold on
+subplot(row1000,col1000,4)
+    plot(timeVector,gear(indexVector),lineStyle)
+    ylabel('$g_{GR}$','interpreter','latex','fontname','timesnewroman','fontsize',font) 
+    xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    set(gca,'yaxislocation','right');
+    hold on
+subplot(row1000,col1000,5)
+    plot(timeVector,slipLeft(indexVector),lineStyle)
+    ylim([0 35])
+    ylabel('$i,\hspace{1mm}(\%)\hspace{2mm}slip$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    hold on
+subplot(row1000,col1000,6)
+    plot(timeVector,engThrtlState,lineStyle)
+    ylabel('$\Gamma$ Throttle','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    set(gca,'yaxislocation','right');
+    ylim([0 1])
+    hold on
+
 
 %% Data Plots
 figure(3)
