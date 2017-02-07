@@ -6,6 +6,7 @@ function plot_bayes_estimation(tractor,structRBE,nConstantMT865,nTimeParam,estim
 nTimeStep = nTimeParam.nTimeStep;
 timeStepS = nTimeParam.timeStepS;
 time = nTimeParam.time;
+indexVector = 1:nTimeStep;
 
 
 % -------------------------- Estimates ------------------------------------
@@ -23,8 +24,6 @@ netTractionNoLoadEstimateMax = structRBE.netTractionNoLoadEstimateMax;
 slipVectorBayes = structRBE.slipVectorBayes;
 
 % ------------------ Terrain Parameters True  -----------------------------
-indexVector = 1:numel(time);
-nTimeStep = numel(time);
 for i = 1:nTimeStep
     terrainCohesion(i) = tractor(i).terrainLeftFront(1);
     terrainFrictionAngle(i) = tractor(i).terrainLeftFront(2);
@@ -64,45 +63,50 @@ fontLabel = 16;
 
 figure(figureNo)
 subplot(231)
-    h = plot(time,cohesionEstimate, estimateColor, time, terrainCohesion(indexVector), trueColor);
+    h = plot(time(indexVector),cohesionEstimate(indexVector), estimateColor, time(indexVector), terrainCohesion(indexVector), trueColor);
     set(h(2),'linewidth',lineWidthSize)
-    legend('Estimate','Actual','location','southwest')
     ylim([0 8])
+    xlim([0 time(end)])
     ylabel('cohesion','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
     hold on
 subplot(232)
-    h = plot(time,frictionAngleEstimate, estimateColor, time, terrainFrictionAngle(indexVector), trueColor);
+    h = plot(time(indexVector),frictionAngleEstimate(indexVector), estimateColor, time(indexVector), terrainFrictionAngle(indexVector), trueColor);
     set(h(2),'linewidth',lineWidthSize)
     ylabel('friction Angle','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
     ylim([10 25])
+    xlim([0 time(end)])
     hold on
 subplot(233)
-    h = plot(time,nEstimate, estimateColor, time, terrainn(indexVector), trueColor);
+    h = plot(time(indexVector),nEstimate(indexVector), estimateColor, time(indexVector), terrainn(indexVector), trueColor);
     set(h(2),'linewidth',lineWidthSize)
     ylabel('n','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
     ylim([0.5 1.5])
+    xlim([0 time(end)])
     hold on
 subplot(234)
-    h = plot(time,keqEstimate, estimateColor, time, terrainkeq(indexVector), trueColor);
+    h = plot(time(indexVector),keqEstimate(indexVector), estimateColor, time(indexVector), terrainkeq(indexVector), trueColor);
     set(h(2),'linewidth',lineWidthSize)
     ylabel('keq ','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
     ylim([100 600])
+    xlim([0 time(end)])
     hold on
 subplot(235)
-    h = plot(time,KEstimate, estimateColor, time, terrainK, trueColor);
+    h = plot(time(indexVector), KEstimate(indexVector), estimateColor, time(indexVector), terrainK(indexVector), trueColor);
     set(h(2),'linewidth',lineWidthSize)
     ylabel('K ','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
+    xlim([0 time(end)])
     hold on
 subplot(236)
-    h = plot(time,SEstimate, estimateColor, time, terrainS(indexVector), trueColor);
+    h = plot(time(indexVector),SEstimate(indexVector), estimateColor, time(indexVector), terrainS(indexVector), trueColor);
     set(h(2),'linewidth',lineWidthSize)
     ylabel('S','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
+    xlim([0 time(end)])
     hold on
     
     
@@ -120,27 +124,33 @@ subplot(236)
 
 if strcmp(histString,'plotHist')
 figure(figureNo+1)
-    histogram(peakSlipNoLoadHypotheses,[0:45])
-    ylabel('Count No')
-    xlabel('Peak Traction Slip')
+    histogram(peakSlipNoLoadHypotheses,[2:42])
+    ylabel('Model or Hypothesis Count','interpreter','latex','fontsize',fontLabel)
+    xlabel('Peak Traction Slip $i_{pk}$','interpreter','latex','fontsize',fontLabel)
+    set(gca,'fontsize',fontLabel)
 end
     
 
 figure(figureNo+2)
 subplot(121)
-    h = plot(time, peakSlip, estimateColor, time, peakSlipLoadTrue, trueColor);
+    h = plot(time(indexVector), peakSlip(indexVector), estimateColor, time(indexVector), peakSlipLoadTrue(indexVector), trueColor);
     set(h(2),'linewidth',lineWidthSize)
-    ylim([0 30])
-    legend('Estimate','True')
+    ylim([5 30])
+    xlim([0 time(end)])
     ylabel('Peak Slip (\%)','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
+    set(gca,'fontsize',fontLabel)
     hold on
 subplot(122)
-    h = plot(time, netTractionNoLoadEstimateMax, estimateColor, time, netTractionNoLoadTrueMax, trueColor);
+    h = plot(time(indexVector), netTractionNoLoadEstimateMax(indexVector)./1000, estimateColor, time(indexVector), netTractionNoLoadTrueMax(indexVector)./1000, trueColor);
     set(h(2),'linewidth',lineWidthSize)
-    ylabel('Peak Net Traction (N)','interpreter','latex','fontsize',fontLabel)
+    ylabel('Peak Net Traction (kN)','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
+    set(gca,'fontsize',fontLabel)
+    xlim([0 time(end)])
+    ylim([70 130])
     hold on
+    
     
 % endValue = time(end);
 % timeAugmented = 0:2:endValue;

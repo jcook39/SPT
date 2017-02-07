@@ -1,9 +1,19 @@
-function [ gearNoNew ] = gear_shift_controller( structTractionController, omegaHat, gearNoOld, nConstantMT865 )
+function [ gearNoNew ] = gear_shift_controller( structTractionController, gearNoOld, nConstantMT865, timeStepNo, timeStepS )
 % 
 
 % ------------------ Unpack Needed Controller Parameters ------------------
+gearControlString = structTractionController.gearControlString;
+engSpeedRadPS = structTractionController.engSpeedRadPS;
+
+% 'maxPower' gear controller parameters
 gearShiftControlEngineRPMTargetRPM = structTractionController.gearShiftControlEngineRPMTargetRPM;
 gearShiftControlEngineRPMTargetRadPS = gearShiftControlEngineRPMTargetRPM*((2*pi)/60); 
+
+% 'engineRPMRange' gear controller parameters
+gearShiftControlHighEngineRPMBound = structTractionController.gearShiftControlHighEngineRPMBound;
+gearShiftControlHighEngineRadPSBound = gearShiftControlHighEngineRPMBound*((2*pi)/60);
+gearShiftControlLowEngineRPMBound = structTractionController.gearShiftControlLowEngineRPMBound;
+gearShiftControlLowEngineRadPSBound = gearShiftControlLowEngineRPMBound*((2*pi)/60);
 
 % ------------------- Unpack Needed Tractor Paramters ---------------------
 nGearNo = nConstantMT865.nGearNo;
@@ -12,25 +22,35 @@ FD = nConstantMT865.finalDriveRatio;
 engineTorqueDataNM = nConstantMT865.engineTorqueDataNM;
 engineSpeedDataRadPS = nConstantMT865.engineSpeedDataRadPS;
 
-% --------------- Compute Optimal Gear Ratio ------------------------------
-% Note: Optimal here means the gear ratio that minimizes the squared error
-% between the engine speed associated with "omegaRef" and
-% "gearShiftControlEngineRPMTargetRPM"
+% ------------------- Gather Last Second History of Engine Speeds ---------
+timeLookBack = 0.5;
+nTimeStepLookBack = timeLookBack/timeStepS;
+timeStepNoLookBackEnd = timeStepNo;
+timeStepNoLookBackBeg = timeStepNoLookBackEnd - nTimeStepLookBack;
+if timeStepNoLookBackBeg < 1
+    timeStepNoLookBackBeg = 1;
+end
+timeStepNoLookBack = timeStepNoLookBackBeg:timeStepNoLookBackEnd;
+engSpeedRadPSLookBack = engSpeedRadPS(timeStepNoLookBack,1);
 
-lumpedGR = nGR*FD;
-engineSpeedRadPSnGR = omegaHat*lumpedGR; % Engine Speed in each gear ratio for the track reference speed
-diffHold = (engineSpeedRadPSnGR - gearShiftControlEngineRPMTargetRadPS).^2; % difference between reference and actual for each gear
-indexOptimalGR = min(diffHold) == diffHold;
-gearNoNew = nGearNo(indexOptimalGR);
+% ----------------------- Gear Shift Control ------------------------------
 
-% Ensure only 1 gear shift takes place
-diffGearNo = gearNoNew - gearNoOld;
-gearShiftMoreThanOne = (abs(diffGearNo) > 1);
-if gearShiftMoreThanOne
-    gearNoNew = gearNoOld + sign(diffGearNo);
+engSpeedRadPSBelowBound = sum((engSpeedRadPSLookBack < gearShiftControlLowEngineRadPSBound) >= 1);
+engSpeedRadPSAboveBound = sum((engSpeedRadPSLookBack > gearShiftControlHighEngineRadPSBound) >= 1);
+engSpeedRadPSInBound = ~engSpeedRadPSBelowBound && ~engSpeedRadPSAboveBound;
+if engSpeedRadPSBelowBound
+    gearNoNew = gearNoOld - 1;
+elseif engSpeedRadPSAboveBound
+    gearNoNew = gearNoOld + 1;
+elseif engSpeedRadPSInBound
+    gearNoNew = gearNoOld;    
 end
 
-
+if gearNoNew < 1
+    gearNoNew = 1;
+elseif gearNoNew > 16
+    gearNoNew = 16;
+end
 
 end
 

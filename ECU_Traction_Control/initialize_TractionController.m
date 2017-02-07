@@ -38,7 +38,6 @@ structTractionController.tractionControlIsOn = zeros(nTimeStep,1);
 structTractionController.gearShiftControlUpdateRateHz = 0.5;
 structTractionController.gearShiftControlIsOn = zeros(nTimeStep,1);
 structTractionController.gearShiftControlCountInt = zeros(nTimeStep,1);
-structTractionController.gearShiftControlEngineRPMTargetRPM = 1700;
 structTractionController.gearNo = zeros(nTimeStep,1);
 
 structTractionController.gearShiftFlag = zeros(nTimeStep,1);
@@ -46,5 +45,28 @@ structTractionController.sysControllerD = sysControllerD;
 
 % --------------- Traction Control is On ----------------------------------
 structTractionController.FlagTCisOn = 1;
+
+% ---------------- Traction Control Last Throttle Input -------------------
+structTractionController.lastThrottleInputTC = 0;
+
+% ----------- Traciton Control On at Least once flag ----------------------
+structTractionController.TChasBeenTurnedOnAtLeastOnce = 0;
+
+% --------------- Store Engine Speed RadPS --------------------------------
+structTractionController.engSpeedRadPS = zeros(nTimeStep,1);
+structTractionController.engSpeedRadPS(1,1) = 1800*((2*pi)/60);
+% Put first value within bounds so that it doesnt throw controller off
+
+% ------------------- Max Power RPM Gear Controller Parameters ------------
+structTractionController.gearShiftControlEngineRPMTargetRPM = 1700;
+
+% ------------------ RPM Bounds Gear Controller Paramters -----------------
+structTractionController.gearShiftControlLowEngineRPMBound = 1350;
+structTractionController.gearShiftControlHighEngineRPMBound = 1950;
+
+% --- Set minimum sprocket speed in any gear ratio based on engine RPM ----
+structTractionController.minimumEngineSpeedRPMRef = ...
+    structTractionController.gearShiftControlLowEngineRPMBound - 50;
+
 
 end

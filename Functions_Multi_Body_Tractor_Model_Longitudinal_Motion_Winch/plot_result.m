@@ -202,36 +202,42 @@ subplot(row1000,col1000,1)
     plot(timeVector,X(indexVector),lineStyle)
     ylabel('$X\hspace{2mm}(m)$','interpreter','latex','fontname','timesnewroman','fontsize',font)
     xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    set(gca,'fontname','times new roman','fontsize',16);
     hold on
 subplot(row1000,col1000,2)
     plot(timeVector,vx(indexVector),lineStyle)
     ylabel('$v_T\hspace{2mm}(m/s)$','interpreter','latex','fontname','timesnewroman','fontsize',font)
     xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
     set(gca,'yaxislocation','right');
+    set(gca,'fontname','times new roman','fontsize',16);
     hold on
 subplot(row1000,col1000,3)
     plot(timeVector,engSpdRadPS(indexVector).*((60)/(2*pi)),lineStyle)
     ylim([1000 2300])
     ylabel('$\Omega_E\hspace{2mm}(RPM)$','interpreter','latex','fontname','timesnewroman','fontsize',font)
     xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    set(gca,'fontname','times new roman','fontsize',16)
     hold on
 subplot(row1000,col1000,4)
     plot(timeVector,gear(indexVector),lineStyle)
     ylabel('$g_{GR}$','interpreter','latex','fontname','timesnewroman','fontsize',font) 
     xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
     set(gca,'yaxislocation','right');
+    set(gca,'fontname','times new roman','fontsize',16)
     hold on
 subplot(row1000,col1000,5)
     plot(timeVector,slipLeft(indexVector),lineStyle)
-    ylim([0 35])
-    ylabel('$i,\hspace{1mm}(\%)\hspace{2mm}slip$','interpreter','latex','fontname','times new roman','fontsize',font)
+    ylim([0 50])
+    ylabel('$i,\hspace{1mm}(\%)$','interpreter','latex','fontname','times new roman','fontsize',font)
     xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    set(gca,'fontname','times new roman','fontsize',16)
     hold on
 subplot(row1000,col1000,6)
     plot(timeVector,engThrtlState,lineStyle)
-    ylabel('$\Gamma$ Throttle','interpreter','latex','fontname','times new roman','fontsize',font)
+    ylabel('$\Pi$','interpreter','latex','fontname','times new roman','fontsize',font)
     xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
     set(gca,'yaxislocation','right');
+    set(gca,'fontname','times new roman','fontsize',16)
     ylim([0 1])
     hold on
 

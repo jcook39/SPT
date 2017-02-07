@@ -34,6 +34,11 @@ nConstantMT865.timeConstantClutch = 0.1;
 nConstantMT865.inertiaEngineKGM2 = 1;
 nConstantMT865.engineDamp = 1;
 
+% Engine Idler controller Settings
+nConstantMT865.idleSpeedReferenceRadPS = 1250*((2*pi)/60);
+nConstantMT865.speedThresholdRadPS = 40*((2*pi)/60);
+nConstantMT865.timeConstantIdleController = 0.5;
+
 % Transmission Parameters
 nConstantMT865.nGearNo = 1:16;
 nConstantMT865.nGearRatio = [8.44205 6.64811 5.25283 4.13660 3.47409 3.08571 2.73585 ...

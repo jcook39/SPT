@@ -1,10 +1,10 @@
-function plot_terrain_hypothesis_2(structRBE, structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, figureNo)
+function plot_terrain_hypothesis_2(structRBE, structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, tractorColor, hypothesisString, figureNo)
 % This function plots all terrain hypothesis for the Recursive Bayes
 % Estimator
 
 % --------------------- Color Declarations --------------------------------
 trueColor = 'b.';
-estimateColor = 'r.';
+estimateColor = tractorColor;
 
 % ---------------------- Unpack Structures --------------------------------
 terrainHypotheses = structRBE.terrainHypotheses;
@@ -48,6 +48,9 @@ x = structDTKF.x;
 xHatPlus = structDTKF.xHatPlus;
 xError = structDTKF.xError;
 y = structDTKF.y;
+
+slipHat = structDTKF.slipHat;
+slipHatSmooth = structDTKF.slipHatSmooth;
 
 slipVectorEstimate = 100*(1-(xHatPlus(1,indexVector)./(rollingRadiusM*xHatPlus(2,indexVector))));
 slipVectorTrue = 100*(1-(x(1,indexVector)./(rollingRadiusM*x(2,indexVector))));
@@ -98,40 +101,47 @@ end % end for
 %         ylabel('sinkage (in)')
 %         hold on
 
+if strcmp(hypothesisString, 'plotHypothesis')
 fontLabel = 16;        
     figure(figureNo+1)
     subplot(121)
-        plot( slip, F_TNetMat)
-        ylabel('Net Traction no Payload (N)','interpreter','latex','fontsize',fontLabel)
+        plot( slip, F_TNetMat./1000)
+        ylabel('Net Traction $F_{net}$ (kN)','interpreter','latex','fontsize',fontLabel)
         xlabel('slip ratio (\%)','interpreter','latex','fontsize',fontLabel)
         xlim([0 100])
         hold on
     subplot(122)
-        plot( slip, tauRes )
-        ylabel('Resistance Torque (N)','interpreter','latex','fontsize',fontLabel)
+        plot( slip, tauRes./1000 )
+        ylabel('Resistance Torque $\tau_{res}$ (kN)','interpreter','latex','fontsize',fontLabel)
         xlabel('slip ratio (\%)','interpreter','latex','fontsize',fontLabel)
         xlim([0 100])
         hold on
+end
 
 lineWidthSize = 2;
 fontLabel = 16;        
     figure(figureNo+2)
     subplot(121)
-        plot(slip, F_TNetMat);
-        hold on
-        h = plot(slipVectorEstimate, xHatPlus(3,indexVector), estimateColor);% slip, F_TNetMat);
+        if strcmp(hypothesisString, 'plotHypothesis')
+            plot(slip, F_TNetMat./1000);
+            hold on
+        end
+        h = plot(slipHatSmooth, xHatPlus(3,indexVector)./1000, estimateColor);% slip, F_TNetMat);
         set(h(1),'linewidth',lineWidthSize);
-        ylabel('Net Traction no Payload (N)','interpreter','latex','fontsize',fontLabel)
+        ylabel('Net Traction $F_{net}$ (kN)','interpreter','latex','fontsize',fontLabel)
         xlabel('slip ratio (\%)','interpreter','latex','fontsize',fontLabel)
         xlim([0 100])
         hold on
         
     subplot(122)
-        h = plot(slipVectorEstimate, xHatPlus(5,indexVector), estimateColor, slip, tauRes );
+        if strcmp(hypothesisString, 'plotHypothesis')
+            plot(slip, tauRes./1000);
+            hold on
+        end
+        h = plot(slipHatSmooth, xHatPlus(5,indexVector)./1000, estimateColor );
         set(h(1),'linewidth',lineWidthSize);
-        ylabel('Resistance Torque (N)','interpreter','latex','fontsize',fontLabel)
+        ylabel('Resistance Torque $\tau_{res}$ (kNm)','interpreter','latex','fontsize',fontLabel)
         xlabel('slip ratio (\%)','interpreter','latex','fontsize',fontLabel)
-        legend('Estimate')
         xlim([0 100])
         hold on
         

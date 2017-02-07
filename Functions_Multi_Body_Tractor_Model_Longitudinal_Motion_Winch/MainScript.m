@@ -18,11 +18,11 @@ nConstantMT865 = initialize_constant_tractors_parameters(resCoeff,bladderNo);
 
 % --------------------------- Tractor1 ------------------------------------
 nConstantTerrain.indTrac(:,1) = [1:3].';
-nConstantTerrain.nLocX(1:3,1:2) = [0 30; 30 130; 130 300]; 
+nConstantTerrain.nLocX(1:3,1:2) = [0 30; 30 130; 130 250]; 
 nConstantTerrain.nLocY(1:3,1:2) = [0 10; 0 10; 0 10];
 % Terrain Vectors for each boundry
 nConstantTerrain.cohesion(1:3,1) = [6.1 3 8].'; 
-nConstantTerrain.frictionAngle(1:3,1) = [20 18.1 20].';
+nConstantTerrain.frictionAngle(1:3,1) = [20 17.8 20].';
 nConstantTerrain.n(1:3,1) = [1 1 1].';
 nConstantTerrain.keq(1:3,1) = [500 333 500].'; % Units in Meters (Keq) - does not seem to effect peak traction pt
 nConstantTerrain.K(1:3,1) = [2 0.7 2].';
@@ -58,7 +58,7 @@ nConstantTerrain.nLocX(10:12,1:2) = nConstantTerrain.nLocX(1:3,1:2);
 nConstantTerrain.nLocY(10:12,1:2) = nConstantTerrain.nLocY(7:9,1:2) + 10;
 % Terrain Vectors for each boundry
 nConstantTerrain.cohesion(10:12,1) = [6.1 5.7 6.3].'; 
-nConstantTerrain.frictionAngle(10:12,1) = [20 17.1 20].';
+nConstantTerrain.frictionAngle(10:12,1) = [20 16.8 20].';
 nConstantTerrain.n(10:12,1) = [1 1 1].';
 nConstantTerrain.keq(10:12,1) = [500 375 500].'; % Units in Meters (Keq) - does not seem to effect peak traction pt
 nConstantTerrain.K(10:12,1) = [2 6.8 4].';
@@ -80,7 +80,7 @@ nConstantTerrain.S(indexTerrain5,1) = [0.6/33 0.8/33 0.6/33].';
 nConstantTerrain.terrainActual = [nConstantTerrain.cohesion.'; nConstantTerrain.frictionAngle.'; ...
     nConstantTerrain.n.'; nConstantTerrain.keq.'; nConstantTerrain.K.'; nConstantTerrain.S.'];
 % Grid Specifications
-nConstantTerrain.gridSizeXM = 300;
+nConstantTerrain.gridSizeXM = 250;
 nConstantTerrain.gridSizeYM = 50;
 nConstantTerrain.gridResolutionM = 0.1;
 nConstantTerrain.Mode = 'Region';
@@ -88,14 +88,14 @@ nConstantTerrain = generate_terrain(nConstantTerrain,nConstantMT865);
 
 %% --------------- Set Simulation Integration Time Steps ------------------
 nTimeParam.timeStepS = 0.05;
-nTimeParam.simulationTime = 100;
+nTimeParam.simulationTime = 90;
 nTimeParam.time = [0:nTimeParam.timeStepS:nTimeParam.simulationTime].'; % Time array based on sample time and total simulation time
 nTimeParam.nTimeStep = size(nTimeParam.time,1); % Total number of time steps
 
 %% ------------------- Set Open Loop Control Inputs -----------------------
 
 % Tractor One - Do nothing with winch
-throttleTractor1 =      [0.23 0.25  0.25 0.33 0.4 0.4  0.5  0.5  0.9 0.9  0.8 0.9 0.4 0.4 0.4].';
+throttleTractor1 =      [0.24 0.26  0.3 0.4 0.5 0.6  0.7  0.7  0.9 0.9  0.8 0.9 0.4 0.4 0.4].';
 %gearTractor1 =          [2    3     4    5    6   7    8    9    9   9    9   9   9   9   9  ].';
 gearTractor1 =          [2    3     4    5    6   7    8    8    8   8    8   8   8   8   8  ].';
 steerAngleDegTractor1 = [0    0     0    0    0   0    0    0    0   0    0   0   0   0   0  ].'; 
@@ -142,7 +142,10 @@ structRBE_3 = terrain_hypothesis(structRBE_3, nConstantMT865, nTimeParam.nTimeSt
 controlArchitecture.structRBE = structRBE_3;
 
 % Traction Controller
-structTractionController = initialize_TractionController( 0.27, 0.15, 1E-6, 1E-6, nConstantMT865, nTimeParam.nTimeStep);
+% Kp = 0.27, Ki = 0.15, Kd = 1E-6, Tf = 1E-6
+structTractionController = initialize_TractionController( 0.28, 0.2, 0.03, 0.3, nConstantMT865, nTimeParam.nTimeStep);
+%structTractionController.gearControlString = 'maxPower';
+structTractionController.gearControlString = 'engineRPMRange';
 controlArchitecture.structTractionController = structTractionController;
 
 
@@ -194,37 +197,42 @@ tractor5(1:nTimeParam.nTimeStep) = MT865_5;
 controlArchitecture5 = controlArchitecture;
 
 %% ------------------------ Simulate Tractors -----------------------------
-[tractor1, controlArchitecture1, inputMat1] = tractor_simulate(tractor1, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture1);
-[tractor2, controlArchitecture2, inputMat2] = tractor_simulate(tractor2, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture2);
-[tractor3, controlArchitecture3, inputMat3] = tractor_simulate(tractor3, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture3);
-[tractor4, controlArchitecture4, inputMat4] = tractor_simulate(tractor4, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture4);
-[tractor5, controlArchitecture5, inputMat5] = tractor_simulate(tractor5, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture5);
+[tractor1, controlArchitecture1, inputMat1, nTimeParam1] = tractor_simulate(tractor1, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture1);
+[tractor2, controlArchitecture2, inputMat2, nTimeParam2] = tractor_simulate(tractor2, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture2);
+[tractor3, controlArchitecture3, inputMat3, nTimeParam3] = tractor_simulate(tractor3, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture3);
+[tractor4, controlArchitecture4, inputMat4, nTimeParam4] = tractor_simulate(tractor4, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture4);
+[tractor5, controlArchitecture5, inputMat5, nTimeParam5] = tractor_simulate(tractor5, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture5);
 
-% ---------------------------- Plot Result -------------------------------
-plot_result(tractor1,inputMat1,'r',nConstantMT865,nConstantTerrain, nTimeParam,1)
-plot_result(tractor2,inputMat2,'b',nConstantMT865,nConstantTerrain, nTimeParam,0)
-plot_result(tractor3,inputMat3,'g',nConstantMT865,nConstantTerrain, nTimeParam,0)
-plot_result(tractor4,inputMat4,'c',nConstantMT865,nConstantTerrain, nTimeParam,0)
-plot_result(tractor5,inputMat5,'m',nConstantMT865,nConstantTerrain, nTimeParam,0)
+%---------------------------- Plot Result -------------------------------
+plot_result(tractor1,inputMat1,'r',nConstantMT865,nConstantTerrain, nTimeParam1, 1)
+plot_result(tractor2,inputMat2,'b',nConstantMT865,nConstantTerrain, nTimeParam2, 0)
+plot_result(tractor3,inputMat3,'g',nConstantMT865,nConstantTerrain, nTimeParam3, 0)
+plot_result(tractor4,inputMat4,'c',nConstantMT865,nConstantTerrain, nTimeParam4, 0)
+plot_result(tractor5,inputMat5,'m',nConstantMT865,nConstantTerrain, nTimeParam5, 0)
 
 controlArchitecture1.structDTKF.plotSmooth = 'noPlotSmooth';
-%plot_DTKF_result(controlArchitecture1.structDTKF, 1, 1:2,nConstantTerrain, nConstantMT865, nTimeParam, 305);
+plot_DTKF_result(controlArchitecture1.structDTKF, 1, 1:2,nConstantTerrain, nConstantMT865, nTimeParam, 305);
 
 
-plot_terrain_curves(controlArchitecture1.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 1, 502)
-plot_terrain_curves(controlArchitecture2.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 2, 506)
-plot_terrain_curves(controlArchitecture3.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 3, 510)
-plot_terrain_curves(controlArchitecture4.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 4, 514)
-plot_terrain_curves(controlArchitecture5.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 5, 518)
+plot_terrain_curves(controlArchitecture1.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam1, 1, 502, 530, 'r')
+plot_terrain_curves(controlArchitecture2.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam2, 2, 506, 530, 'b')
+plot_terrain_curves(controlArchitecture3.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam3, 3, 510, 530, 'g')
+plot_terrain_curves(controlArchitecture4.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam4, 4, 514, 530, 'c')
+plot_terrain_curves(controlArchitecture5.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam5, 5, 518, 530, 'm')
 
 
-plot_terrain_hypothesis_2(controlArchitecture1.structRBE, controlArchitecture1.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 522)
- 
-plot_bayes_estimation(tractor1, controlArchitecture1.structRBE, nConstantMT865, nTimeParam, 'r.', 'r', 'plotHist', 605)
-plot_bayes_estimation(tractor2, controlArchitecture2.structRBE, nConstantMT865, nTimeParam, 'b.', 'b', 'plotHist', 605)
-plot_bayes_estimation(tractor3, controlArchitecture3.structRBE, nConstantMT865, nTimeParam, 'g.', 'g', 'plotHist', 605)
-plot_bayes_estimation(tractor4, controlArchitecture4.structRBE, nConstantMT865, nTimeParam, 'c.', 'c', 'plotHist', 605)
-plot_bayes_estimation(tractor5, controlArchitecture5.structRBE, nConstantMT865, nTimeParam, 'm.', 'm', 'plotHist', 605)
+plot_terrain_hypothesis_2(controlArchitecture1.structRBE, controlArchitecture1.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'r.', 'plotHypothesis', 522)
+plot_terrain_hypothesis_2(controlArchitecture2.structRBE, controlArchitecture2.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'b.', 'noPlotHypothesis',522)
+plot_terrain_hypothesis_2(controlArchitecture3.structRBE, controlArchitecture3.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'g.', 'noPlotHypothesis', 522)
+plot_terrain_hypothesis_2(controlArchitecture4.structRBE, controlArchitecture4.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'c.', 'noPlotHypothesis', 522)
+plot_terrain_hypothesis_2(controlArchitecture5.structRBE, controlArchitecture5.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'm.', 'noPlotHypothesis', 522)
+
+
+plot_bayes_estimation(tractor1, controlArchitecture1.structRBE, nConstantMT865, nTimeParam1, 'r.', 'r', 'plotHist', 605)
+plot_bayes_estimation(tractor2, controlArchitecture2.structRBE, nConstantMT865, nTimeParam2, 'b.', 'b', 'plotHist', 605)
+plot_bayes_estimation(tractor3, controlArchitecture3.structRBE, nConstantMT865, nTimeParam3, 'g.', 'g', 'plotHist', 605)
+plot_bayes_estimation(tractor4, controlArchitecture4.structRBE, nConstantMT865, nTimeParam4, 'c.', 'c', 'plotHist', 605)
+plot_bayes_estimation(tractor5, controlArchitecture5.structRBE, nConstantMT865, nTimeParam5, 'm.', 'm', 'plotHist', 605)
 
 plot_traction_control( tractor1, nConstantMT865, controlArchitecture1.structTractionController, controlArchitecture1.structDTKF, inputMat1, nTimeParam, 1, 800)
 plot_traction_control( tractor2, nConstantMT865, controlArchitecture2.structTractionController, controlArchitecture2.structDTKF, inputMat2, nTimeParam, 2, 802)

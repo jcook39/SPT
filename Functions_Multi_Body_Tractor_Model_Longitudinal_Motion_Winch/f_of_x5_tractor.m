@@ -43,6 +43,10 @@ maxFlowBrakeValveM3 = nConstantMT865.maxFlowBrakeValveM3;
 RsledN = nConstantMT865.RsledN;
 mS = nConstantMT865.massSledKG;
 
+idleSpeedReferenceRadPS = nConstantMT865.idleSpeedReferenceRadPS;
+speedThresholdRadPS = nConstantMT865.speedThresholdRadPS;
+timeConstantIdleController = nConstantMT865.timeConstantIdleController;
+
 %% Unwrap Inputs and State
 
 % Inputs
@@ -185,7 +189,7 @@ make_M_F();
     engThrtlDot = (1/transTau)*(-engThrtl + commandThrottle);
     engSpdRadPSDot;
     clutchEngageDot = (1/clutchTau)*(-com + clutchCmd);
-    engineControlThrottleDot = (0.5*( 1-tanh(4*((engSpdRadPS - (1275*((2*pi)/60) ) )/5))) - engCtrlThrtl )/0.5;
+    engineControlThrottleDot = (0.5*( 1-tanh(4*((engSpdRadPS - idleSpeedReferenceRadPS )/speedThresholdRadPS))) - engCtrlThrtl )/timeConstantIdleController;
         nPowerTrainState = [engThrtlDot engSpdRadPSDot clutchEngageDot engineControlThrottleDot];
 
     % Added States for Winch

@@ -11,7 +11,7 @@ countInt = countInt + 1;
 timeSinceLastControl = timeStepS*countInt;
 
 % ----------------- Logic for Controller Activation -----------------------
-if timeSinceLastControl == updateRateSec
+if timeSinceLastControl >= updateRateSec
     countInt = 0;
     controllerFlag = 1;
 else
