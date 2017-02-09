@@ -25,7 +25,7 @@ while integrationIsNotComplete
         x0 = x(end,:).';
         t0 = t(end);
         clutchEventTrigger = sum( ie == 1);
-        winchEventTrigger = sum( ie == 2);
+        winchEventTrigger = (0 < sum((ie == 2) + (ie == 3) + (ie == 4)) );
         if clutchEventTrigger 
             MT865.clutchIsSlip = ~MT865.clutchIsSlip; 
             fprintf('Clutch Is Slip %d \n ',MT865.clutchIsSlip), 
@@ -34,15 +34,35 @@ while integrationIsNotComplete
             MT865.winchIsLocked = ~MT865.winchIsLocked;
             fprintf('Winch is Locked %d \n',MT865.winchIsLocked)
             if MT865.winchIsLocked
-                winchCableIsAtMaxLengthM = (winchCableMaxM <= winchRadiusM*x0(15));
-                x0(16) = 0; % Speed of Winch Set to Zero Once locked
-                if ~winchCableIsAtMaxLengthM
-                    x0(14) = x0(4); % Speed of Sled Equals Speed of Tractor
-                elseif winchCableIsAtMaxLengthM
+                cablePulledInToMinimumLengthM = sum(ie == 2);
+                brakingHasStoppedWinch = sum(ie == 3);
+                winchCableHasReachedMaximumLengthM = sum(ie == 4);
+                if or(cablePulledInToMinimumLengthM, brakingHasStoppedWinch)
+                    x0(16) = 0; % Speed of Winch Set to Zero Once locked
+                    x0(14) = x0(4);
+                elseif winchCableHasReachedMaximumLengthM
+                    x0(16) = 0;
                     x0(14) = 0.1;
-                    x0(4) = x0(14); 
+                    x0(4) = x0(14);
                 end
-            end
+            elseif ~MT865.winchIsLocked
+                % These events do not require resetting the values of any
+                % states
+                winchHasBrokenLooseFromBraking = sum(ie == 2);
+                winchIsReelingInPayLoad = sum(ie == 3);
+            end          
+            %MT865.winchIsLocked = ~MT865.winchIsLocked;
+            %fprintf('Winch is Locked %d \n',MT865.winchIsLocked)
+            %if MT865.winchIsLocked
+            %    winchCableIsAtMaxLengthM = (winchCableMaxM <= winchRadiusM*x0(15));
+            %    x0(16) = 0; % Speed of Winch Set to Zero Once locked
+            %    if ~winchCableIsAtMaxLengthM
+            %        x0(14) = x0(4); % Speed of Sled Equals Speed of Tractor
+            %    elseif winchCableIsAtMaxLengthM
+            %        x0(14) = 0.1;
+            %        x0(4) = x0(14); 
+            %    end
+            %end
         end % end if     
     else % integrationIsComplete
         MT865.state = x(end,:).';
@@ -121,21 +141,19 @@ end % end While
     
     %% Winch Logic for Detecting Locked Winch
         if ~winchIsLocked
-            if valvePos == 1 % Pull In 
+                % Cable Pulled In All the way
                 value(2) = psiWinchRad; 
                 isTerminal(2) = 1;
                 direction(2) = -1;
-            elseif valvePos == 2 % Brake
-                value(2) = psiWinchRadPS;
-                isTerminal(2) = 1;
-                direction(2) = 0;
-            elseif valvePos == 3 % Let Sled Pull Out Winch
-                value(2) = psiWinchRad*rw - winchCableMaxM;
-                isTerminal(2) = 1;
-                direction(2) = 1;
-            end % end if
+                % Brake has stopped winch
+                value(3) = psiWinchRadPS;
+                isTerminal(3) = 1;
+                direction(3) = 0;
+                % Cable ahs reach maximum length
+                value(4) = psiWinchRad*rw - winchCableMaxM;
+                isTerminal(4) = 1;
+                direction(4) = 1;
         else % winchIsLocked
-            if valvePos == 2 % Brake     
                 M = [mT 0   1;
                      0  mS -1;
                     -1  1  0];
@@ -144,11 +162,17 @@ end % end While
                 F(3,1) = 0;
                 a = M\F; DBP = a(3);
                 torqWinchNM = Dm*hydPrO*GRm;
+                % Insufficient torque to keep winch locked
                 value(2) = -torqWinchNM + DBP*rw;
                 isTerminal(2) = 1;
                 direction(2) = 1;
-                %fprintf('value(2) : %f \n',value(2))
-            end
+                % If enough torque to reel in winch from max length
+                winchCableIsAtMaximumLength = (psiWinchRad*rw == winchCableMaxM);
+                if winchCableIsAtMaximumLength
+                    value(3) = -torqWinchNM + DBP*rw;
+                    isTerminal(3) = 1;
+                    direction(3) = -1;
+                end
         end % end if
         
     end % End Events Function

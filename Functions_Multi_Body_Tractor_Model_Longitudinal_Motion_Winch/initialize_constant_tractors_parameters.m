@@ -60,7 +60,7 @@ nConstantMT865.brakeFrictionCoeff = 0.2;
 nConstantMT865.winchRadiusM = rw;
 nConstantMT865.winchInertiaKGM2 = (pi*(rw/2)^2)*0.7874*8050*(1/2)*((rw/2)^2);
 nConstantMT865.winchDamp = 3;
-nConstantMT865.winchCableMaxM = 50;
+nConstantMT865.winchCableMaxM = 20;
 
 % Initialize Winch Controller Gains
 nConstantMT865.KiPull = 0.05;
