@@ -24,6 +24,7 @@ engDamp = nConstantMT865.engineDamp;
 rw = nConstantMT865.winchRadiusM;
 Jw = nConstantMT865.winchInertiaKGM2;
 winchDamp = nConstantMT865.winchDamp;
+winchCableMaxM = nConstantMT865.winchCableMaxM;
 
 DpMax = nConstantMT865.displacementPumpM3;
 Dm = nConstantMT865.displacementMotorM3;
@@ -89,7 +90,11 @@ hydPrO = x(18);
 % Unwrap Current State (In the Sense of a State Machine)
 clutchIsSlip = MT865.clutchIsSlip;
 winchIsLocked = MT865.winchIsLocked;
-RsledN = RsledN*(vXsled > 0);
+winchCableIsAtMaxLengthM = (winchCableMaxM <= rw*psiWinchRad);
+if ~winchCableIsAtMaxLengthM
+    RsledN = RsledN*(vXsled > 0);
+end
+    
 
 %% AG Element Hydraulics
 

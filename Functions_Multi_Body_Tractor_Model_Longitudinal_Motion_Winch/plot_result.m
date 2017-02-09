@@ -11,7 +11,7 @@ timeStepS = nTimeParam.timeStepS;
 time = nTimeParam.time;
 
 indexVector = 1:nTimeStep;
-timeVector = (indexVector-1)*timeStepS;
+timeVector = time(indexVector);
 
 %% Declare Vectors for States
 initVec = zeros(nTimeStep,1);
@@ -86,6 +86,7 @@ for i = 1:nTimeStep
     terrainn(i) = tractor(i).terrainLeftFront(5);
     terrainS(i) = tractor(i).terrainLeftFront(6);
     
+    winchIsLocked(i) = tractor(i).winchIsLocked;
     
     % Controller Parameters
     Error(i) = tractor(i).Error;
@@ -450,7 +451,6 @@ subplot1(3)
     plot(timeVector,psiWinchRad(indexVector)*rw,lineStyle)
     %ylabel('Winch Pos (m)','fontsize',font)
     ylabel('${\psi}r_W\hspace{2mm}(m)$','interpreter','latex','fontsize',font)
-    ylim([0 25])
     hold on
 subplot1(4)
     plot(timeVector,psiWinchRadPS(indexVector)*rw,lineStyle)
@@ -602,4 +602,6 @@ subplot1(4)
     %xlabel('time (seconds)','fontsize',font)
     hold on
 
+figure(10)
+    plot(timeVector,winchIsLocked(indexVector))
 end

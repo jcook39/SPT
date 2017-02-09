@@ -1,8 +1,13 @@
 function [MT865] = motion_tractor(MT865,input,nConstantMT865,nConstantTerrain,timeStepS)
 
+%% Unpack Parameters
+
+% --------------------------- Unpack nConstantMT865 -----------------------
+winchCableMaxM = nConstantMT865.winchCableMaxM;
+winchRadiusM = nConstantMT865.winchRadiusM;
+
 
 %% Integration Routine 
-
 integrationIsNotComplete = 1;
 t0 = 0;
 tf = timeStepS;
@@ -29,9 +34,14 @@ while integrationIsNotComplete
             MT865.winchIsLocked = ~MT865.winchIsLocked;
             fprintf('Winch is Locked %d \n',MT865.winchIsLocked)
             if MT865.winchIsLocked
+                winchCableIsAtMaxLengthM = (winchCableMaxM <= winchRadiusM*x0(15));
                 x0(16) = 0; % Speed of Winch Set to Zero Once locked
-                x0(14) = x0(4); % Speed of Sled Equals Speed of Tractor
-                %fprintf('Winch is Locked %d \n',MT865.winchIsLocked)
+                if ~winchCableIsAtMaxLengthM
+                    x0(14) = x0(4); % Speed of Sled Equals Speed of Tractor
+                elseif winchCableIsAtMaxLengthM
+                    x0(14) = 0.1;
+                    x0(4) = x0(14); 
+                end
             end
         end % end if     
     else % integrationIsComplete
