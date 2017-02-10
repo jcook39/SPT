@@ -35,10 +35,10 @@ for timeStepNo = 2:nTimeStep
    [ structTractionController, inputMat ] = traction_control( structTractionController, structRBE, structDTKF, tractor(timeStepNo), inputMat, nConstantMT865, timeStepNo, nTimeParam );
    end
    
-%    tractorIsStuck = check_if_tractor_stuck(structDTKF,timeStepNo);
-%    if tractorIsStuck == 1
-%        break
-%    end
+   tractorIsStuck = check_if_tractor_stuck(structDTKF,timeStepNo);
+   if tractorIsStuck == 1
+       break
+   end
    
   fprintf('Simulation Time: %f seconds \n',(timeStepNo-1)*timeStepS)       
 end

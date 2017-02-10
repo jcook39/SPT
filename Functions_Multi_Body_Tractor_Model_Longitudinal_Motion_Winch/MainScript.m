@@ -125,28 +125,33 @@ structRBE_1 = structRBE;
 structRBE_1.covariance = [5e8 5e8];
 structRBE_1.normalizeString = 'noNormalize';
 structRBE_1.lowProbThreshold = 1e-3;
-structRBE_1 = terrain_hypothesis(structRBE_1, nConstantMT865, nTimeParam.nTimeStep);
+structRBE_1 = terrain_hypothesis(structRBE_1, nConstantMT865, nTimeParam);
 
 structRBE_2 = structRBE;
 structRBE_2.covariance = [2e-3 2e-3];
 structRBE_2.normalizeString = 'normalize';
 structRBE_2.lowProbThreshold = 1e-3;
-structRBE_2 = terrain_hypothesis(structRBE_2, nConstantMT865, nTimeParam.nTimeStep);
+structRBE_2 = terrain_hypothesis(structRBE_2, nConstantMT865, nTimeParam);
 
 structRBE_3 = structRBE;
 structRBE_3.terrainHypDefK = 0.5:1:7.5;
 structRBE_3.covariance = structRBE_2.covariance;
 structRBE_3.normalizeString = 'normalize';
 structRBE_3.lowProbThreshold = 1e-4;
-structRBE_3 = terrain_hypothesis(structRBE_3, nConstantMT865, nTimeParam.nTimeStep);
+structRBE_3 = terrain_hypothesis(structRBE_3, nConstantMT865, nTimeParam);
 controlArchitecture.structRBE = structRBE_3;
 
 % Traction Controller
 % Kp = 0.27, Ki = 0.15, Kd = 1E-6, Tf = 1E-6
-structTractionController = initialize_TractionController( 0.28, 0.2, 0.03, 0.3, nConstantMT865, nTimeParam.nTimeStep);
+structTractionController = initialize_TractionController( 0.28, 0.22, 0.03, 0.3, nConstantMT865, nTimeParam.nTimeStep);
 %structTractionController.gearControlString = 'maxPower';
+structTractionController.peakSlipRefString = 'peakSlipRefSmooth';
 structTractionController.gearControlString = 'engineRPMRange';
 controlArchitecture.structTractionController = structTractionController;
+
+% Winch Controller
+structWinchController = initialize_Winch_Controller(nTimeParam);
+controlArchitecture.structWinchController = structWinchController;
 
 
 %% ------------ Initialize Tractor and Tractor Structure ------------------

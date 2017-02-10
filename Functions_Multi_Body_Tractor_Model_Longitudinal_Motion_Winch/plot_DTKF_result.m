@@ -165,7 +165,7 @@ subplot(322)
     grid on
 subplot(323)    
     h = plot(timeVector,slipVectorTrue,trueColor,timeVector,slipHat,estimateColor,...
-        timeVector,slipVectorMeasure,measureColor,timeVector,slipHatSmooth,smoothColor)
+        timeVector,slipVectorMeasure,measureColor,timeVector,slipHatSmooth,smoothColor);
     set(h(1),'linewidth',lineWidthSize)
     set(h(4),'linewidth',lineWidthSize)
     xlabel('time (seconds)')

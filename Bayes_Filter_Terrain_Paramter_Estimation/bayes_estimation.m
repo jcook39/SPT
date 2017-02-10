@@ -25,6 +25,10 @@ lowProbThreshold = structRBE.lowProbThreshold;
 normalizeString = structRBE.normalizeString;
 slipVectorBayes = structRBE.slipVectorBayes;
 
+peakSlipSmoothm1 = structRBE.peakSlipSmooth(timeStepNo-1,1);
+peakSlipSmootherAd = structRBE.peakSlipSmootherAd;
+peakSlipSmootherBd = structRBE.peakSlipSmootherBd;
+
 % --------------------------  Bayes Estimator -----------------------------
 
 liklihood = zeros(nHypotheses,1);
@@ -74,6 +78,7 @@ if isSlipDiscrepancy
     error('Error: peak slip discrepancy, check function peak_traction')
 end
 peakSlip = peakSlipNoLoad;
+peakSlipSmooth = peakSlipSmootherAd*peakSlipSmoothm1 + peakSlipSmootherBd*peakSlip;
 
 % ------------------- Package Recrusive Bayes Structure -------------------
 structRBE.terrainProbability(:,timeStepNo) = posteriorProbability;
@@ -81,6 +86,7 @@ structRBE.parameterEstimate(:,timeStepNo) = parameterEstimate.';
 structRBE.liklihood(:,timeStepNo) = liklihood;
 structRBE.normalization(timeStepNo) = normalization;
 structRBE.peakSlip(1,timeStepNo) = peakSlip;
+structRBE.peakSlipSmooth(timeStepNo,1) = peakSlipSmooth;
 structRBE.netTractionNoLoadEstimateMax(1,timeStepNo) = netTractionNoLoadEstimateMax;
 
 end

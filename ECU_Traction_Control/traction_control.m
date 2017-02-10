@@ -15,7 +15,6 @@ FD = nConstantMT865.finalDriveRatio;
 inputkm1 = inputMat(timeStepNo-1,:);
 inputk = inputMat(timeStepNo,:);
 gearNoOld = inputkm1(1,2);
-GR = nGR(gearNoOld);
 
 % ------------------- Unpack Needed Tractor States ------------------------
 x = tractor.state;
@@ -35,8 +34,15 @@ smoothedvHat = structDTKF.smoothedvHat(1,timeStepNo);
 slipHat = structDTKF.slipHat(1,timeStepNo);
 slipHatSmooth = structDTKF.slipHatSmooth(1,timeStepNo);
 
-% ---------------------- Unpack RBE Parameters ----------------------------
+% ---------------------- Peak Slip Reference Control ----------------------
 peakSlip = structRBE.peakSlip(1,timeStepNo);
+peakSlipSmooth = structRBE.peakSlipSmooth(timeStepNo,1);
+peakSlipRefString = structTractionController.peakSlipRefString;
+if strcmp(peakSlipRefString,'peakSlipRefSmooth')
+    peakSlipRef = peakSlipSmooth;
+elseif strcmp(peakSlipRefString,'peakSlipRefNoSmooth')
+    peakSlipRef = peakSlip;
+end
 
 % --------- Unpack Controller Structure: structTractionController ---------
 tractionControlIsOn = structTractionController.tractionControlIsOn(timeStepNo-1);
@@ -94,9 +100,9 @@ if tractionControlIsOn
     end
     
     % -------------- Compute Track Speed Input ----------------------------
-    iref = peakSlip;
+    iref = peakSlipRef;
     omegaRef = smoothedvHat/( rollingRadiusM*(1-(iref/100)) );
-    floorOmegaRef = minimumEngineSpeedRadPSRef/(GR*FD);
+    floorOmegaRef = minimumEngineSpeedRadPSRef/(nGR(gearNoNew)*FD);
     if (omegaRef < floorOmegaRef) % Need to compute minimum for gear selection
         omegaRef = floorOmegaRef;
     end
@@ -104,6 +110,17 @@ if tractionControlIsOn
     % -------------------- Compute Feed Forward Term ----------------------
     if strcmp(feedForwardString, 'usePastValue')
         throttleFeedForward = throttleFeedForwardm1;
+        gearNoIsChanged = (gearNoNew ~= gearNoOld);
+        if ~gearNoIsChanged
+            throttleFeedForward = throttleFeedForwardm1;
+        elseif gearNoIsChanged
+            lumpedGRNew = nGR(gearNoNew)*FD;
+            lumpedGROld = nGR(gearNoOld)*FD;
+            K_EOld = engine_interp( 1, 0, engSpeedRadPS, nConstantMT865);
+            engSpeedRadPSNewHat = omegaHat*lumpedGRNew;
+            K_ENew = engine_interp( 1, 0, engSpeedRadPSNewHat, nConstantMT865);
+            throttleFeedForward = (throttleFeedForwardm1*K_EOld*lumpedGROld)/(K_ENew*lumpedGRNew);
+        end
     elseif strcmp(feedForwardString, 'useDriverValue')
         throttleFeedForward = inputkm1(1);
     end

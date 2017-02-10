@@ -96,11 +96,13 @@ refColor = 'c';
 figure(figureNo)
 set(gcf,'numbertitle','off','name',['Terrian Tractor',num2str(tractorNo)])
 subplot(231)
-    plot(timeVector, iref, refColor, timeVector, slip, trueColor,...
-    timeVector, slipHat, estimatedColor, timeVector, slipHatSmooth, smoothColor)
+    h = plot(timeVector, slip, trueColor,...
+    timeVector, slipHat, estimatedColor, timeVector, slipHatSmooth, smoothColor, timeVector, iref, refColor);
+    set(h(4),'linewidth',4)
     legend('slip reference','slip actual','estimated slip')
 subplot(232)
-    plot(timeVector, omegaRef, refColor, timeVector, w, trueColor, timeVector, omegaHat, estimatedColor)
+    h = plot(timeVector, w, trueColor, timeVector, omegaHat, estimatedColor, timeVector, omegaRef, refColor);
+    set(h(3),'linewidth',4)
     legend('\omega_{ref}','\omega','\omega_{est}')
 subplot(233)
     plot(timeVector, throttleControllerPIDF)

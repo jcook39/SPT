@@ -1,10 +1,14 @@
-function structRBE = terrain_hypothesis(structRBE, nConstantMT865, nTimeStep)
+function structRBE = terrain_hypothesis(structRBE, nConstantMT865, nTimeParam)
 
 % --------------- Unpack Ncessary Parameters form structRBE ---------------
 covariance = structRBE.covariance;
 
 % --------------- Unpack Necessary Tractor Parameters ---------------------
 trackWidthM = nConstantMT865.trackWidthM;
+
+% ---------------- Unpack time parameters for simulation ------------------
+nTimeStep = nTimeParam.nTimeStep;
+timeStepS = nTimeParam.timeStepS;
 
 % ---------------------- Terrain Hypotheses -------------------------------
 % terrainHypothesis is a matrix where each parameter vector in a single hypothesis
@@ -62,6 +66,13 @@ terrainHypotheses = [terrainHypothesisOne terrainHypothesisTwo terrainHypothesis
     terrainHypothesisFour terrainHypothesisFive];
 
 % -------------------------------------------------------------------------
+% Slip Smoother
+% xdot = (1/TC)(-x + u);
+TC = 0.75;
+peakSlipSmootherA = -1/TC;
+peakSlipSmootherB = 1/TC;
+filterTimeStepS = timeStepS;
+[peakSlipSmootherAd, peakSlipSmootherBd] = c2d(peakSlipSmootherA, peakSlipSmootherB, filterTimeStepS);
 
 % ------------------------- Terrain Hypotheses New ------------------------
 
@@ -76,6 +87,9 @@ structRBE.terrainProbability(:,1) = 1/nHypotheses;
 structRBE.nHypotheses = nHypotheses;
 structRBE.covarianceMatrix = diag(covariance);
 structRBE.peakSlip = zeros(1, nTimeStep);
+structRBE.peakSlipSmooth = zeros(nTimeStep,1);
+structRBE.peakSlipSmootherAd = peakSlipSmootherAd;
+structRBE.peakSlipSmootherBd = peakSlipSmootherBd;
 structRBE.peakTractionMatHypotheses = peakTractionMatHypotheses;
 
 

@@ -258,7 +258,7 @@ subplot(423)
     ylabel('yaw Angle ')
     hold on
 subplot(424)
-    plot(timeVector,throttle(indexVector),timeVector,engThrtlState,lineStyle,timeVector,engCtrlThrtl(indexVector))
+    plot(timeVector,throttle(indexVector),timeVector,engThrtlState,lineStyle,timeVector,engCtrlThrtl(indexVector),'*')
     legend('Throttle Cmd','Throttle Cmd State','Eng Ctrl Thrtl')
     ylim([0 1])
     hold on
