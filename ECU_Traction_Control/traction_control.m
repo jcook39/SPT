@@ -120,6 +120,8 @@ if tractionControlIsOn
             engSpeedRadPSNewHat = omegaHat*lumpedGRNew;
             K_ENew = engine_interp( 1, 0, engSpeedRadPSNewHat, nConstantMT865);
             throttleFeedForward = (throttleFeedForwardm1*K_EOld*lumpedGROld)/(K_ENew*lumpedGRNew);
+            throttleDiff = throttleFeedForward - throttleFeedForwardm1;
+            throttleFeedForward = throttleFeedForwardm1 + 0.5*throttleDiff;
         end
     elseif strcmp(feedForwardString, 'useDriverValue')
         throttleFeedForward = inputkm1(1);

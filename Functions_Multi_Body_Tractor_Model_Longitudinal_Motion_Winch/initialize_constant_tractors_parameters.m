@@ -60,7 +60,7 @@ nConstantMT865.brakeFrictionCoeff = 0.2;
 nConstantMT865.winchRadiusM = rw;
 nConstantMT865.winchInertiaKGM2 = (pi*(rw/2)^2)*0.7874*8050*(1/2)*((rw/2)^2);
 nConstantMT865.winchDamp = 3;
-nConstantMT865.winchCableMaxM = 20;
+nConstantMT865.winchCableMaxM = 80;
 
 % Initialize Winch Controller Gains
 nConstantMT865.KiPull = 0.05;
@@ -84,6 +84,7 @@ nConstantMT865.displacementMotorM3 = 107*(1E-6); %0.003286;
 nConstantMT865.gearRatioMotor = 18;
 %nConstantMT865.maxFlowBrakeValveM3 = nConstantMT865.displacementMotorM3*120; % 70 radPS
 nConstantMT865.maxFlowBrakeValveM3 = 5*nConstantMT865.pumpMaxFlowM3S;
+nConstantMT865.maxFlowBrakeValveM3 = 20*nConstantMT865.pumpMaxFlowM3S;
 
 nConstantMT865.leakFlowM3S = 0.1*(1E-7); % cm^3/s to m^3/s
 

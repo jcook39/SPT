@@ -27,12 +27,14 @@ for timeStepNo = 2:nTimeStep
    structRBE = bayes_estimation(structRBE, structDTKF, nConstantMT865, time, timeStepNo);
    end
    
-   if structWinchController.FlagWCisOn
-   [tractor(timeStepNo), inputMat(timeStepNo,:)] = winch_controller(tractor(timeStepNo),inputMat(timeStepNo,:),inputMat(timeStepNo-1,:),nConstantMT865,structDTKF,structTractionController,structWinchController,timeStepNo);
-   end
-   
    if structTractionController.FlagTCisOn
    [ structTractionController, inputMat ] = traction_control( structTractionController, structRBE, structDTKF, tractor(timeStepNo), inputMat, nConstantMT865, timeStepNo, nTimeParam );
+   end
+   
+   if structWinchController.FlagWCisOn
+   [tractor(timeStepNo), inputMat(timeStepNo,:),structWinchController] = winch_controller(tractor(timeStepNo),inputMat(timeStepNo,:),inputMat(timeStepNo-1,:),nConstantMT865,structDTKF,structTractionController,structWinchController,nTimeParam,timeStepNo);
+   else
+       [tractor(timeStepNo)] = detect_valve_change(tractor(timeStepNo),inputMat(timeStepNo,:),inputMat(timeStepNo-1,:));
    end
    
    tractorIsStuck = check_if_tractor_stuck(structDTKF,timeStepNo);

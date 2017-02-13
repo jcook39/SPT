@@ -21,12 +21,23 @@ nConstantTerrain.indTrac(:,1) = [1:3].';
 nConstantTerrain.nLocX(1:3,1:2) = [0 30; 30 130; 130 250]; 
 nConstantTerrain.nLocY(1:3,1:2) = [0 10; 0 10; 0 10];
 % Terrain Vectors for each boundry
-nConstantTerrain.cohesion(1:3,1) = [6.1 3 8].'; 
+nConstantTerrain.cohesion(1:3,1) = [6.1 2 8].'; 
 nConstantTerrain.frictionAngle(1:3,1) = [20 17.8 20].';
 nConstantTerrain.n(1:3,1) = [1 1 1].';
-nConstantTerrain.keq(1:3,1) = [500 333 500].'; % Units in Meters (Keq) - does not seem to effect peak traction pt
+nConstantTerrain.keq(1:3,1) = [500 300 500].'; % Units in Meters (Keq) - does not seem to effect peak traction pt
 nConstantTerrain.K(1:3,1) = [2 0.7 2].';
 nConstantTerrain.S(1:3,1) = [0.6/33 0.8/33 0.6/33].';
+
+% nConstantTerrain.indTrac(:,1) = [1:3].';
+% nConstantTerrain.nLocX(1:3,1:2) = [0 30; 30 130; 130 250]; 
+% nConstantTerrain.nLocY(1:3,1:2) = [0 10; 0 10; 0 10];
+% % Terrain Vectors for each boundry
+% nConstantTerrain.cohesion(1:3,1) = [6.1 3 8].'; 
+% nConstantTerrain.frictionAngle(1:3,1) = [20 17.8 20].';
+% nConstantTerrain.n(1:3,1) = [1 1 1].';
+% nConstantTerrain.keq(1:3,1) = [500 333 500].'; % Units in Meters (Keq) - does not seem to effect peak traction pt
+% nConstantTerrain.K(1:3,1) = [2 0.7 2].';
+% nConstantTerrain.S(1:3,1) = [0.6/33 0.8/33 0.6/33].';
 
 nConstantTerrain.terrainActual = [nConstantTerrain.cohesion.'; nConstantTerrain.frictionAngle.'; ...
     nConstantTerrain.n.'; nConstantTerrain.keq.'; nConstantTerrain.K.'; nConstantTerrain.S.'];
@@ -40,7 +51,7 @@ nConstantTerrain = generate_terrain(nConstantTerrain,nConstantMT865);
 
 %% --------------- Set Simulation Integration Time Steps ------------------
 nTimeParam.timeStepS = 0.05;
-nTimeParam.simulationTime = 90;
+nTimeParam.simulationTime = 40;
 nTimeParam.time = [0:nTimeParam.timeStepS:nTimeParam.simulationTime].'; % Time array based on sample time and total simulation time
 nTimeParam.nTimeStep = size(nTimeParam.time,1); % Total number of time steps
 
@@ -103,6 +114,7 @@ controlArchitecture.structTractionController = structTractionController;
 
 % Winch Controller
 structWinchController = initialize_Winch_Controller(nTimeParam);
+structWinchController.FlagWCisOn = 0;
 controlArchitecture.structWinchController = structWinchController;
 
 %% ------------ Initialize Tractor and Tractor Structure ------------------

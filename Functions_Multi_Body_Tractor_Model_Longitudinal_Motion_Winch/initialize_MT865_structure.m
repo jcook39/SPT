@@ -37,7 +37,7 @@ if strcmp('ZERO',initialCondString)
     powerTrainState = [engThrtl engSpeedRadPS clutchCom engCtrlThrtl].';
     
     % additional states due to hydraulic implement
-    psiWinchRad = 10*pi;
+    psiWinchRad = 0*pi;
     Xsled = X - nConstantMT865.tractorCG2WinchM + psiWinchRad*nConstantMT865.winchRadiusM;
     vXsled = vx;
     psiWinchRadPS = 0;
@@ -67,7 +67,7 @@ elseif strcmp('pseudo_rest',initialCondString)
     powerTrainState = [engThrtl engSpeedRadPS clutchCom engCtrlThrtl].';
     
     % additional states due to hydraulic implement
-    psiWinchRad = 10*pi;
+    psiWinchRad = 0*pi;
     Xsled = X - nConstantMT865.tractorCG2WinchM + psiWinchRad*nConstantMT865.winchRadiusM;
     vXsled = vx;
     psiWinchRadPS = 0;
