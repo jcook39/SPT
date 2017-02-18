@@ -1,4 +1,4 @@
-function [ structTractionController, inputMat ] = traction_control( structTractionController, structRBE, structDTKF, tractor, inputMat, nConstantMT865, timeStepNo, nTimeParam )
+function [ structTractionController, inputMat ] = traction_control( structTractionController, structRBE, structDTKF, structWinchController, tractor, inputMat, nConstantMT865, timeStepNo, nTimeParam )
 
 % ------------------ Unpack time parameters -------------------------------
 timeStepS = nTimeParam.timeStepS;
@@ -18,6 +18,8 @@ gearNoOld = inputkm1(1,2);
 
 % ------------------- Unpack Needed Tractor States ------------------------
 x = tractor.state;
+
+engineThrottle = x(9);
 engSpeedRadPS = x(10);
 structTractionController.engSpeedRadPS(timeStepNo,1) = engSpeedRadPS;
 
@@ -59,17 +61,20 @@ TChasBeenTurnedOnAtLeastOnce = structTractionController.TChasBeenTurnedOnAtLeast
 minimumEngineSpeedRPMRef = structTractionController.minimumEngineSpeedRPMRef;
 minimumEngineSpeedRadPSRef = minimumEngineSpeedRPMRef*((2*pi)/60);
 
+% ---------------- Unpack winchController Structure -----------------------
+winchControlIsOn = structWinchController.winchControlIsOn(timeStepNo-1,1);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ====== Logic for Activating/Deactivating Traction Controller ============
 if tractionControlIsOn
-    if slipHatSmooth < 5
+    if slipHat < 5
         tractionControlIsOn = 0;
     end
     if tractionControlIsOn 
         feedForwardString = 'usePastValue';         
     end
 elseif ~tractionControlIsOn
-    if slipHatSmooth > 25
+    if slipHat > 25
         tractionControlIsOn = 1;
     end
     if tractionControlIsOn   % 
@@ -83,7 +88,8 @@ fprintf('controlIsOn = %f \n',tractionControlIsOn)
 if tractionControlIsOn
     
     % ------------------ Gear Shift Controller ----------------------------
-    [gearShiftControlCountInt, gearShiftFlag] = controller_counter_func(gearShiftControlUpdateRateHz, gearShiftControlCountInt, timeStepS);
+    shiftIsNeeded = determine_gear_shift( structTractionController, gearNoOld, nConstantMT865, timeStepNo, timeStepS );
+    [gearShiftControlCountInt, gearShiftFlag] = controller_counter_func_gearShift(gearShiftControlUpdateRateHz, gearShiftControlCountInt, timeStepS, shiftIsNeeded);
     if gearShiftFlag
         [ gearNoNew ] = gear_shift_controller( structTractionController, gearNoOld, nConstantMT865, timeStepNo, timeStepS );
         structTractionController.gearNo(timeStepNo,1) = gearNoNew;
@@ -125,6 +131,7 @@ if tractionControlIsOn
         end
     elseif strcmp(feedForwardString, 'useDriverValue')
         throttleFeedForward = inputkm1(1);
+        %throttleFeedForward = engineThrottle;
     end
     
     % --------------------- PI CONTROLLER ---------------------------------
@@ -149,12 +156,13 @@ if tractionControlIsOn
 elseif ~tractionControlIsOn
     
     % ------------------ Gear Shift Controller ----------------------------
-    [gearShiftControlCountInt, gearShiftFlag] = controller_counter_func(gearShiftControlUpdateRateHz, gearShiftControlCountInt, timeStepS);
+    shiftIsNeeded = determine_gear_shift( structTractionController, gearNoOld, nConstantMT865, timeStepNo, timeStepS );
+    [gearShiftControlCountInt, gearShiftFlag] = controller_counter_func_gearShift(gearShiftControlUpdateRateHz, gearShiftControlCountInt, timeStepS, shiftIsNeeded);
         if ~TChasBeenTurnedOnAtLeastOnce % if the Traction Controller has not come on yet in the simulation
             gearNoNew = gearNoOld;
         elseif TChasBeenTurnedOnAtLeastOnce && (currentSimTime < 20)
             gearNoNew = inputk(1,2);
-        elseif TChasBeenTurnedOnAtLeastOnce && (currentSimTime >= 20)
+        elseif TChasBeenTurnedOnAtLeastOnce && (currentSimTime >= 20) % && ~winchControlIsOn
             if gearShiftFlag
                 [ gearNoNew ] = gear_shift_controller( structTractionController, gearNoOld, nConstantMT865, timeStepNo, timeStepS );
                 structTractionController.gearNo(timeStepNo,1) = gearNoNew;
@@ -162,18 +170,27 @@ elseif ~tractionControlIsOn
             else
                 gearNoNew = gearNoOld;
             end
+        %elseif winchControlIsOn
+        %    gearNoNew = gearNoOld;
         end
         inputk(1,2) = gearNoNew;
         structTractionController.gearNo(timeStepNo,1) = gearNoNew;
+        gearNoShiftedDown = ( (gearNoOld - gearNoNew) == 1 );
     
     % ----------- Use last output from TC once it turns off ---------------
-    throttleInput = lastThrottleInputTC;
+    %throttleInput = lastThrottleInputTC;
+    throttleInput = inputkm1(1,1);
     if ~TChasBeenTurnedOnAtLeastOnce
         throttleInput = inputkm1(1,1);
     elseif TChasBeenTurnedOnAtLeastOnce && (currentSimTime < 20)
         throttleInput = inputk(1,1);
-    elseif TChasBeenTurnedOnAtLeastOnce && (currentSimTime >=20)
-        throttleInput = lastThrottleInputTC;
+    elseif TChasBeenTurnedOnAtLeastOnce && (currentSimTime >=20) %&& ~winchControlIsOn
+        %throttleInput = lastThrottleInputTC;
+        throttleInput = inputkm1(1,1);
+        if winchControlIsOn && gearNoShiftedDown
+            throttleInput = throttleInput + 0.05;
+            fprintf('throttle Increased \n')
+        end
     end
     inputk(1,1) = throttleInput;
     
@@ -258,15 +275,41 @@ throttleControllerPID = (1/a0)*(-ukm1*a1 - ukm2*a2...
 end
 
 
+function shiftIsNeeded = determine_gear_shift( structTractionController, gearNoOld, nConstantMT865, timeStepNo, timeStepS )
+
+[ gearNoNew ] = gear_shift_controller( structTractionController, gearNoOld, nConstantMT865, timeStepNo, timeStepS );
+    if gearNoNew ~= gearNoOld
+        shiftIsNeeded = 1;
+    elseif gearNoNew == gearNoOld
+        shiftIsNeeded = 0;        
+    end
+
+end
+
+
+function [countInt, controllerFlag] = controller_counter_func_gearShift(updateRateHz, countInt, timeStepS, shiftIsNeeded)
+% This is general purpose function for determining whether the controller
+% should be active at a given time step based on its update rate. This is
+% so that the simulation time step "timeStepS" can run at a different rate
+% that a given controller "updateRateHz"
+
+
+% ------------ Increment Counter and Compute Time Since Last Control Action
+updateRateSec = 1/updateRateHz;
+countInt = countInt + 1;
+timeSinceLastControl = timeStepS*countInt;
+
+% ----------------- Logic for Controller Activation -----------------------
+if (timeSinceLastControl >= updateRateSec) && shiftIsNeeded
+    countInt = 0;
+    controllerFlag = 1;
+else
+    controllerFlag = 0;
+end
 
 
 
-
-
-
-
-
-
+end
 
 
 

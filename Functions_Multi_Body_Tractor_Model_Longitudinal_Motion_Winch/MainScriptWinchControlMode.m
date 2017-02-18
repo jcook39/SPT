@@ -18,15 +18,15 @@ nConstantMT865 = initialize_constant_tractors_parameters(resCoeff,bladderNo);
 
 % --------------------------- Tractor1 ------------------------------------
 nConstantTerrain.indTrac(:,1) = [1:3].';
-nConstantTerrain.nLocX(1:3,1:2) = [0 30; 30 130; 130 250]; 
+nConstantTerrain.nLocX(1:3,1:2) = [0 30; 30 100; 100 250]; 
 nConstantTerrain.nLocY(1:3,1:2) = [0 10; 0 10; 0 10];
 % Terrain Vectors for each boundry
-nConstantTerrain.cohesion(1:3,1) = [6.1 2 8].'; 
-nConstantTerrain.frictionAngle(1:3,1) = [20 17.8 20].';
+nConstantTerrain.cohesion(1:3,1) = [6.1 2 3].'; % 4.1
+nConstantTerrain.frictionAngle(1:3,1) = [20 17.8 19].';
 nConstantTerrain.n(1:3,1) = [1 1 1].';
 nConstantTerrain.keq(1:3,1) = [500 300 500].'; % Units in Meters (Keq) - does not seem to effect peak traction pt
 nConstantTerrain.K(1:3,1) = [2 0.7 2].';
-nConstantTerrain.S(1:3,1) = [0.6/33 0.8/33 0.6/33].';
+nConstantTerrain.S(1:3,1) = [0.6/33 0.8/33 0.7/33].';
 
 % nConstantTerrain.indTrac(:,1) = [1:3].';
 % nConstantTerrain.nLocX(1:3,1:2) = [0 30; 30 130; 130 250]; 
@@ -43,7 +43,7 @@ nConstantTerrain.terrainActual = [nConstantTerrain.cohesion.'; nConstantTerrain.
     nConstantTerrain.n.'; nConstantTerrain.keq.'; nConstantTerrain.K.'; nConstantTerrain.S.'];
 
 % Grid Specifications
-nConstantTerrain.gridSizeXM = 250;
+nConstantTerrain.gridSizeXM = 350;
 nConstantTerrain.gridSizeYM = 50;
 nConstantTerrain.gridResolutionM = 0.1;
 nConstantTerrain.Mode = 'Region';
@@ -51,7 +51,7 @@ nConstantTerrain = generate_terrain(nConstantTerrain,nConstantMT865);
 
 %% --------------- Set Simulation Integration Time Steps ------------------
 nTimeParam.timeStepS = 0.05;
-nTimeParam.simulationTime = 40;
+nTimeParam.simulationTime = 120;
 nTimeParam.time = [0:nTimeParam.timeStepS:nTimeParam.simulationTime].'; % Time array based on sample time and total simulation time
 nTimeParam.nTimeStep = size(nTimeParam.time,1); % Total number of time steps
 
@@ -65,7 +65,7 @@ steerAngleDegTractor1 = [0    0     0    0     0     0     0       0      0     
 clutchCmd1 =            [1    1     1    1     1     1     1       1      1     1     1     1     1     1     1  ].';
 valvePosition1 =        [2    2     2    2     2     2     2       2      2     2     2     2     2     2     2  ].'; % 1 - Pull In, 2 - Brake Position 3, Let Sled pull Out Winch
 pSet1 =                 [2700 2700  2700 2700  2700  2700  2700    2700   2700  2700  2700  2700  2700  2700  2700].'*6894.76 ;% psi to N/m^2
-timeScheduleInput1 =    [0    4     8    12    16    18    22      26     45    55    65    75    90    100   110].';
+timeScheduleInput1 =    [0    4     8    12    16    18    22      26     45    55    65    75    90    100   125].';
 inputMat1 = [throttleTractor1 gearTractor1 steerAngleDegTractor1 clutchCmd1 valvePosition1 pSet1 timeScheduleInput1];
 inputMat1 = inputMat_make( inputMat1, nTimeParam.timeStepS );
 
@@ -109,12 +109,12 @@ controlArchitecture.structRBE = structRBE_3;
 structTractionController = initialize_TractionController( 0.28, 0.22, 0.03, 0.3, nConstantMT865, nTimeParam.nTimeStep);
 structTractionController.gearControlString = 'engineRPMRange';
 structTractionController.FlagTCisOn = 1;
-structTractionController.peakSlipRefString = 'peakSlipRefNoSmooth';
+structTractionController.peakSlipRefString = 'peakSlipRefSmooth';
 controlArchitecture.structTractionController = structTractionController;
 
 % Winch Controller
 structWinchController = initialize_Winch_Controller(nTimeParam);
-structWinchController.FlagWCisOn = 0;
+structWinchController.FlagWCisOn = 1;
 controlArchitecture.structWinchController = structWinchController;
 
 %% ------------ Initialize Tractor and Tractor Structure ------------------
@@ -143,3 +143,5 @@ plot_terrain_hypothesis_2(controlArchitecture1.structRBE, controlArchitecture1.s
 plot_bayes_estimation(tractor1, controlArchitecture1.structRBE, nConstantMT865, nTimeParam1, 'r.', 'r', 'plotHist', 605)
 
 plot_traction_control( tractor1, nConstantMT865, controlArchitecture1.structTractionController, controlArchitecture1.structDTKF, inputMat1, nTimeParam, 1, 800)
+
+plot_Winch_Controller(controlArchitecture1.structWinchController, nTimeParam, 900)

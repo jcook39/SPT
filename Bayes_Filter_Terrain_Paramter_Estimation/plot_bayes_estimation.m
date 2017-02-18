@@ -20,6 +20,7 @@ SEstimate = structRBE.parameterEstimate(6,:);
 % This is the slip value at which the vehicle operates with maximum
 % traction force with no load (results show no difference with load)
 peakSlip = structRBE.peakSlip;
+peakSlipSmooth = structRBE.peakSlipSmooth;
 netTractionNoLoadEstimateMax = structRBE.netTractionNoLoadEstimateMax;
 slipVectorBayes = structRBE.slipVectorBayes;
 
@@ -138,6 +139,26 @@ subplot(121)
     ylim([5 30])
     xlim([0 time(end)])
     ylabel('Peak Slip (\%)','interpreter','latex','fontsize',fontLabel)
+    xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
+    set(gca,'fontsize',fontLabel)
+    hold on
+subplot(122)
+    h = plot(time(indexVector), netTractionNoLoadEstimateMax(indexVector)./1000, estimateColor, time(indexVector), netTractionNoLoadTrueMax(indexVector)./1000, trueColor);
+    set(h(2),'linewidth',lineWidthSize)
+    ylabel('Peak Net Traction (kN)','interpreter','latex','fontsize',fontLabel)
+    xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
+    set(gca,'fontsize',fontLabel)
+    xlim([0 time(end)])
+    ylim([70 130])
+    hold on
+    
+figure(figureNo+3)
+subplot(121)
+    h = plot(time(indexVector), peakSlipSmooth(indexVector), estimateColor, time(indexVector), peakSlipLoadTrue(indexVector), trueColor);
+    set(h(2),'linewidth',lineWidthSize)
+    ylim([5 30])
+    xlim([0 time(end)])
+    ylabel('Peak Slip Smoothed(\%)','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
     set(gca,'fontsize',fontLabel)
     hold on

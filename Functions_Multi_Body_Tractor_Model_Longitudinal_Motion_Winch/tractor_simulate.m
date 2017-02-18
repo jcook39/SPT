@@ -28,7 +28,7 @@ for timeStepNo = 2:nTimeStep
    end
    
    if structTractionController.FlagTCisOn
-   [ structTractionController, inputMat ] = traction_control( structTractionController, structRBE, structDTKF, tractor(timeStepNo), inputMat, nConstantMT865, timeStepNo, nTimeParam );
+   [ structTractionController, inputMat ] = traction_control( structTractionController, structRBE, structDTKF, structWinchController, tractor(timeStepNo), inputMat, nConstantMT865, timeStepNo, nTimeParam );
    end
    
    if structWinchController.FlagWCisOn
