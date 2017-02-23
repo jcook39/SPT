@@ -151,6 +151,7 @@ controlArchitecture.structTractionController = structTractionController;
 
 % Winch Controller
 structWinchController = initialize_Winch_Controller(nTimeParam);
+structWinchController.FlagWCisOn = 0;
 controlArchitecture.structWinchController = structWinchController;
 
 

@@ -132,7 +132,7 @@ elseif valvePos == 3
 end
 
 %% Attempt at Control of Throttle for max speed
-    commandThrottle = commandThrottle*tanh( abs(engSpdRadPS - (2100*((2*pi)/60))) / 15); 
+    commandThrottle = commandThrottle*tanh( abs(engSpdRadPS - (2100*((2*pi)/60))) / 10); 
     
 %% Calculate Torque out of the engine and how it is divided between the transmission and steering motor and Winch
     engTorqNM = engine_interp( engThrtl, engCtrlThrtl, engSpdRadPS, nConstantMT865 );

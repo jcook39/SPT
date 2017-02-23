@@ -7,7 +7,9 @@ estimateColor = 'r.';
 % ---------------------- Unpack Structures --------------------------------
 terrainIndex = nConstantTerrain.indTrac(:,tractorNo);
 terrainActual = nConstantTerrain.terrainActual(:,terrainIndex);
-terrainSoft = nConstantTerrain.terrainActual(:,terrainIndex(2,1));
+terrainStart = nConstantTerrain.terrainActual(:,terrainIndex(1,1));
+terrainMiddle = nConstantTerrain.terrainActual(:,terrainIndex(2,1));
+terrainEnd = nConstantTerrain.terrainActual(:,terrainIndex(3,1));
 rollingRadiusM = nConstantMT865.rollingRadiusM;
 
 
@@ -55,18 +57,38 @@ slipVectorMeasure = 100*(1-(y(2,indexVector)./(rollingRadiusM*y(3,indexVector)))
 slip = 0.01:1.5:100;
 
 
-[F_TNetMatActSoft,FActSoft, RActSoft, tauResActSoft, sinkageActSoft] = net_track_force(terrainSoft,nConstantMT865,slip);
-[~, ~, netTractionLoadTrueSoft, ~] = peak_traction(nConstantMT865, terrainSoft, slip, 'AllTraction');
+[F_TNetMatActSoft,FActSoft, RActSoft, tauResActSoft, sinkageActSoft] = net_track_force(terrainMiddle,nConstantMT865,slip);
+[~, ~, netTractionLoadTrueStart, ~] = peak_traction(nConstantMT865, terrainStart, slip, 'AllTraction');
+[~, ~, netTractionLoadTrueMiddle, ~] = peak_traction(nConstantMT865, terrainMiddle, slip, 'AllTraction');
+[~, ~, netTractionLoadTrueEnd, ~] = peak_traction(nConstantMT865, terrainEnd, slip, 'AllTraction');
+
 
 figure(figureNoAll)
-    h = plot(slip, zeros(numel(slip),1),'k:',slip, netTractionLoadTrueSoft./1000,tractorColor);
+subplot(131)
+    h = plot(slip, zeros(numel(slip),1),'k:',slip, netTractionLoadTrueStart./1000,tractorColor);
     set(gca,'fontname','Times New Roman','fontsize',16)
     set(h(1),'LineWidth',2)
     set(h(2),'LineWidth',2)
-    ylabel('net traction with payload (kN)','interpreter','latex','fontsize',16)
+    ylabel('net traction with payload (kN) start terrain','interpreter','latex','fontsize',16)
     xlabel('slip ratio $i$ (\%)','interpreter','latex','fontsize',16)  
     hold on
-
+subplot(132)
+    h = plot(slip, zeros(numel(slip),1),'k:',slip, netTractionLoadTrueMiddle./1000,tractorColor);
+    set(gca,'fontname','Times New Roman','fontsize',16)
+    set(h(1),'LineWidth',2)
+    set(h(2),'LineWidth',2)
+    ylabel('net traction with payload (kN) middle terrain','interpreter','latex','fontsize',16)
+    xlabel('slip ratio $i$ (\%)','interpreter','latex','fontsize',16)  
+    hold on
+subplot(133)
+    h = plot(slip, zeros(numel(slip),1),'k:',slip, netTractionLoadTrueEnd./1000,tractorColor);
+    set(gca,'fontname','Times New Roman','fontsize',16)
+    set(h(1),'LineWidth',2)
+    set(h(2),'LineWidth',2)
+    ylabel('net traction with payload (kN) end terrain','interpreter','latex','fontsize',16)
+    xlabel('slip ratio $i$ (\%)','interpreter','latex','fontsize',16)  
+    hold on
+    
 
 nActualTerrain = size(terrainActual,2);
 for i = 1:nActualTerrain

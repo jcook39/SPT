@@ -15,6 +15,7 @@ structWinchController = controlArchitecture.structWinchController;
 % -------------------- Simulation Loop ------------------------------------
 for timeStepNo = 2:nTimeStep
     
+   fprintf('tractor_simulate winchIsLocked = %f \n',tractor(timeStepNo-1).winchIsLocked)
    % Tractor Dynamics
    tractor(timeStepNo) = motion_tractor(tractor(timeStepNo-1),inputMat(timeStepNo-1,:),nConstantMT865,nConstantTerrain,timeStepS);
    %[tractor(timeStepNo)] = detect_valve_change(tractor(timeStepNo),inputMat(timeStepNo,:),inputMat(timeStepNo-1,:)); 

@@ -12,7 +12,8 @@ winchIsLocked = MT865.winchIsLocked;
 valvePositionIsChange = ~(valvePos == valvePosMinus1);
     if valvePositionIsChange
        winchIsLocked = 0;
-       fprintf('valve position change detected')
+       fprintf('VALVE POSITION CHANGE DETECTED \n')
+       fprintf('WINCH IS UNLOCKED !!!! \n')
        if valvePos == 1
            hydPrO = 0;
        elseif valvePos == 2

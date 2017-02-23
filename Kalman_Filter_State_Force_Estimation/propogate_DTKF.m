@@ -52,6 +52,9 @@ engineThrottle = MT865.state(9);
 engineSpeedRadPS = MT865.state(10);
 engineControlThrottle = MT865.state(12);
 
+engTorq2AgPumpNM = MT865.engTorq2AgPumpNM;
+
+
 % -------------------- Declare Measurement Vector -------------------------
 vxd = MT865.xdot(4);
 v = sqrt(vx^2 + vy^2);
@@ -75,9 +78,10 @@ y = H*x(:,timeStepNo) + measurementNoise.';
 % ------------------ Estimate Input Torque --------------------------------
 engineThrottleSignalWithNoise = engineThrottle + sqrt(engineThrottleSignalNoiseVariance)*randn;
 engTorqNM = engine_interp( engineThrottleSignalWithNoise, engineControlThrottle, engineSpeedRadPS, nConstantMT865 );
+engTorqNM2Trans = engTorqNM - engTorq2AgPumpNM;
 gearNo = input(2,1);
 gearRatio = nGR(gearNo);
-tauApplied = engTorqNM*gearRatio*FD;
+tauApplied = engTorqNM2Trans*gearRatio*FD;
 u = tauApplied;
 
 % ------------------ Propagration Equations -------------------------------
