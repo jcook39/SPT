@@ -74,6 +74,7 @@ nConstantMT865.volumeHighM3 = 0.265/40; % m^3
 nConstantMT865.volumeLowM3 = 0.265/150; % 0.265/100
 nConstantMT865.pressureHighMaxNM2 = 2900*6894.76; % psi to N/m^2
 nConstantMT865.pressureHighSetNM2 = 2800*6894.76; % psi to N/m^2
+nConstantMT865.pressureMaxPumpNM2 = 1500*6894.76;
 
 nConstantMT865.displacementPumpM3 = 85*(1E-6); % cc/rad or cm^3/rad to m^3/rad
 nConstantMT865.gearRatioPump = 1;

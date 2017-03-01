@@ -218,7 +218,10 @@ plot_result(tractor5,inputMat5,'m',nConstantMT865,nConstantTerrain, nTimeParam5,
 
 controlArchitecture1.structDTKF.plotSmooth = 'noPlotSmooth';
 plot_DTKF_result(controlArchitecture1.structDTKF, 1, 1:2,nConstantTerrain, nConstantMT865, nTimeParam, 305);
-
+% plot_DTKF_result(controlArchitecture2.structDTKF, 1, 1:2,nConstantTerrain, nConstantMT865, nTimeParam, 310);
+% plot_DTKF_result(controlArchitecture3.structDTKF, 1, 1:2,nConstantTerrain, nConstantMT865, nTimeParam, 315);
+% plot_DTKF_result(controlArchitecture4.structDTKF, 1, 1:2,nConstantTerrain, nConstantMT865, nTimeParam, 320);
+% plot_DTKF_result(controlArchitecture5.structDTKF, 1, 1:2,nConstantTerrain, nConstantMT865, nTimeParam, 325);
 
 plot_terrain_curves(controlArchitecture1.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam1, 1, 502, 530, 'r')
 plot_terrain_curves(controlArchitecture2.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam2, 2, 506, 530, 'b')

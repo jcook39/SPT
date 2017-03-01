@@ -72,6 +72,15 @@ slipHatSmoothPast = structDTKF.slipHatSmooth(1,timeStepNoPastStart:timeStepNo);
 slipHatHasBeenAbove2ndUpperLimit = (sum(slipHatPast > 35) > 0);
 slipHatHasBeenAbove3rdUpperLimit = (sum(slipHatPast > 20) > 0);
 
+% ----- Input Value used based on winch controller being on/off -----------
+
+valvePositionMinus1 = inputMinus1(1,5);
+if winchControlIsOn
+    valvePosition = valvePositionMinus1;
+elseif winchControlIsOff
+    valvePosition = input(1,5);
+end
+
 % ----------- Logic to turn winch control off and on ----------------------
 winchControlJustTurnedOn = 0;
 if winchControlIsOff && (time(timeStepNo) > 5)
@@ -84,31 +93,32 @@ if winchControlIsOff && (time(timeStepNo) > 5)
        winchControlJustTurnedOn = 1;
     end
 elseif winchControlIsOn
-    if tractionControlIsOff && (psiWinchRad*rw == 0)
+    if (abs(psiWinchRad*rw) < eps)
        winchControlIsOn = 0; 
+       pSet = 2700*6894.76;
+       winchControllerpSetRefm1 = pSet;
+       valvePosition = 2;
        fprintf('WINCH CONTROL TURNED OFF!!!\n')
+       % Crude Hack for not reactivating controller
+       structWinchController.FlagWCisOn = 0;
     end
 end
 
-% ----- Input Value used based on winch controller being on/off -----------
-
-valvePositionMinus1 = inputMinus1(1,5);
-if winchControlIsOn
-    valvePosition = valvePositionMinus1;
-elseif winchControlIsOff
-    valvePosition = input(1,5);
-end
 
 % ----------------- Detect Needed Change in Valve Position ----------------
 if winchControlIsOn && ~winchControlJustTurnedOn
     if valvePosition == 2
         winchIsLocked = abs(psiWinchRadPS - 0) < eps;
-        if winchIsLocked
+        cableIsOut = ( abs(psiWinchRad*rw) > 0); %%%%%%%%%%%%%%%%%%%%%=====%%%%%%%%%%
+        if winchIsLocked && cableIsOut
+           % Switch discrete valve Position
            valvePosition = 1;
-           %winchControllerpSetRefm1 = 0.1*winchControllerpSetRefm1;
+           % Change Inputs for pSet and throttle
            winchControllerpSetRefm1 =  winchControllerpSetIncrementPSI*6894.76;
            pSet = winchControllerpSetRefm1;
-           input(1,1) = input(1,1) + 0.3;           
+           input(1,1) = input(1,1) + 0.3;  
+           % Reset controller counter
+           winchControllerCountInt = 0;
         end
     end
 end
@@ -116,61 +126,75 @@ end
     
 
 % ------------------ Controller Counter and Action ------------------------
-%if valvePosition == 2
-    if winchControlIsOn
-        [winchControllerCountInt, winchControllerFlag] = controller_counter_func_winch(winchControllerUpdateRateHz, winchControllerCountInt, timeStepS);
-        % ______________________ Regular Winch Controller Update ______________
-        if winchControllerFlag
-            % ____________ Tractor is slipping way too much ___________________
-            if tractorIsAboveMaxSlipThreshold
-                pSet = 0*6894.76;
-                winchControllerpSetIncrementPSI = reduce_pSet_increment(winchControllerpSetIncrementPSI, attenuationFactor, winchControllerpSetIncrementPSIMax, winchControllerpSetIncrementPSIMin);
-                fprintf('WC RESET PSET TO ZERO !!! \n')
-            % ____________ Tractor isnt slipping super excessively ____________    
-            elseif tractorIsBelowMaxSlipThreshold
-                if tractionControlIsOn
-                    % _____________ Tractor is about to slip excessively ______
-                    if slipHatHasBeenAbove2ndUpperLimit
-                        if winchControllerpSetRefm1 <= 0
-                            pSet = 0;
-                        else
-                            pSet = winchControllerpSetRefm1 - winchControllerpSetPSIReduceDBFast*6894.76;
-                            if pSet > 0                                 
-                                winchControllerpSetIncrementPSI = reduce_pSet_increment(winchControllerpSetIncrementPSI, attenuationFactor, winchControllerpSetIncrementPSIMax, winchControllerpSetIncrementPSIMin);
-                            end
-                            pSet = pSet*(pSet >= 0);
+if winchControlIsOn && valvePosition == 2
+    [winchControllerCountInt, winchControllerFlag] = controller_counter_func_winch(winchControllerUpdateRateHz, winchControllerCountInt, timeStepS);
+    % ______________________ Regular Winch Controller Update ______________
+    if winchControllerFlag
+        % ____________ Tractor is slipping way too much ___________________
+        if tractorIsAboveMaxSlipThreshold
+            pSet = 0*6894.76;
+            winchControllerpSetIncrementPSI = reduce_pSet_increment(winchControllerpSetIncrementPSI, attenuationFactor, winchControllerpSetIncrementPSIMax, winchControllerpSetIncrementPSIMin);
+            fprintf('WC RESET PSET TO ZERO !!! \n')
+        % ____________ Tractor isnt slipping super excessively ____________    
+        elseif tractorIsBelowMaxSlipThreshold
+            if tractionControlIsOn
+                % _____________ Tractor is about to slip excessively ______
+                if slipHatHasBeenAbove2ndUpperLimit
+                    if winchControllerpSetRefm1 <= 0
+                        pSet = 0;
+                    else
+                        pSet = winchControllerpSetRefm1 - winchControllerpSetPSIReduceDBFast*6894.76;
+                        if pSet > 0                                 
+                            winchControllerpSetIncrementPSI = reduce_pSet_increment(winchControllerpSetIncrementPSI, attenuationFactor, winchControllerpSetIncrementPSIMax, winchControllerpSetIncrementPSIMin);
                         end
-                        fprintf('SLIP HAS EXCEEDED 35 REDUCE PSET \n')
-                    % ___ Tractor Slipping just the right amount (maybe) ______   
-                    else
-                        pSet = winchControllerpSetRefm1;
-                        fprintf('MAINTAIN SLIP SET POINT')
+                        pSet = pSet*(pSet >= 0);
                     end
-                elseif tractionControlIsOff
-                    if slipHatHasBeenAbove3rdUpperLimit
-                        pSet = winchControllerpSetRefm1;
-                        fprintf('TC off MAINTAIN PSET \n')
-                    else
-                        pSet = winchControllerpSetRefm1 + winchControllerpSetIncrementPSI*6894.76;    
-                    end
+                    fprintf('SLIP HAS EXCEEDED 35 REDUCE PSET \n')
+                % ___ Tractor Slipping just the right amount (maybe) ______   
+                else
+                    pSet = winchControllerpSetRefm1;
+                    fprintf('MAINTAIN SLIP SET POINT')
+                end
+            elseif tractionControlIsOff
+                if slipHatHasBeenAbove3rdUpperLimit
+                    pSet = winchControllerpSetRefm1;
+                    fprintf('TC off MAINTAIN PSET \n')
+                else
+                    pSet = winchControllerpSetRefm1 + winchControllerpSetIncrementPSI*6894.76;    
                 end
             end
-
-        elseif ~winchControllerFlag
-            if tractorIsBelowMaxSlipThreshold
-                pSet = winchControllerpSetRefm1;
-            elseif (pSet ~= 0*6894.76) && tractorIsAboveMaxSlipThreshold
-                pSet = 0*6894.76;
-                winchControllerCountInt = 0;
-            end
         end
-        fprintf('Winch is activated \n')
 
-    elseif ~winchControlIsOn
-        winchControllerCountInt = 0;
-        winchControllerFlag = 0;
+    elseif ~winchControllerFlag
+        if tractorIsBelowMaxSlipThreshold
+            pSet = winchControllerpSetRefm1;
+        elseif (pSet ~= 0*6894.76) && tractorIsAboveMaxSlipThreshold
+            pSet = 0*6894.76;
+            winchControllerCountInt = 0;
+        end
     end
-%end
+    pSet = check_limits_pSet(pSet, valvePosition, 2700*psi2Pa, 0*psi2Pa);
+    fprintf('Winch is activated \n')
+    
+elseif winchControlIsOn && valvePosition == 1
+    [winchControllerCountInt, winchControllerFlag] = controller_counter_func_winch(winchControllerUpdateRateHz, winchControllerCountInt, timeStepS);
+    if winchControllerFlag
+        if slipHatHasBeenAbove3rdUpperLimit
+            pSet = winchControllerpSetRefm1;
+        elseif ~slipHatHasBeenAbove3rdUpperLimit
+            pSet = winchControllerpSetRefm1 + winchControllerpSetIncrementPSI*6894.76;
+        end        
+    elseif ~winchControllerFlag
+        pSet = winchControllerpSetRefm1;
+    end
+    pSet = check_limits_pSet(pSet, valvePosition, 1200*psi2Pa, 0*psi2Pa);
+
+elseif ~winchControlIsOn
+    winchControllerCountInt = 0;
+    winchControllerFlag = 0;
+    pSet = 2700*6894.76;
+    valvePosition = 2;
+end
 
 input(1,5) = valvePosition;
 discreteValvePosition = valvePosition;
@@ -249,4 +273,21 @@ elseif winchControllerpSetIncrementPSI > winchControllerpSetIncrementPSIMax
     winchControllerpSetIncrementPSI = winchControllerpSetIncrementPSIMin;
 end
     
+end
+
+
+function pSet = check_limits_pSet(pSet, valvePosition, maxPa, minPa)
+if valvePosition == 2
+    if pSet < minPa
+        pSet = minPa;
+    elseif pSet > maxPa
+        pSet = maxPa;
+    end
+elseif valvePosition == 1
+    if pSet < minPa
+        pSet = minPa;
+    elseif pSet > maxPa
+        pSet = maxPa;
+    end
+end
 end

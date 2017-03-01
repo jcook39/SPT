@@ -141,6 +141,7 @@ subplot(121)
     ylabel('Peak Slip (\%)','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
     set(gca,'fontsize',fontLabel)
+    set(gca,'fontname','times new roman','fontsize',16);
     hold on
 subplot(122)
     h = plot(time(indexVector), netTractionNoLoadEstimateMax(indexVector)./1000, estimateColor, time(indexVector), netTractionNoLoadTrueMax(indexVector)./1000, trueColor);
@@ -150,6 +151,7 @@ subplot(122)
     set(gca,'fontsize',fontLabel)
     xlim([0 time(end)])
     ylim([70 130])
+    set(gca,'fontname','times new roman','fontsize',16);
     hold on
     
 figure(figureNo+3)
@@ -161,6 +163,7 @@ subplot(121)
     ylabel('Peak Slip Smoothed(\%)','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
     set(gca,'fontsize',fontLabel)
+    set(gca,'fontname','times new roman','fontsize',16);
     hold on
 subplot(122)
     h = plot(time(indexVector), netTractionNoLoadEstimateMax(indexVector)./1000, estimateColor, time(indexVector), netTractionNoLoadTrueMax(indexVector)./1000, trueColor);
@@ -170,6 +173,7 @@ subplot(122)
     set(gca,'fontsize',fontLabel)
     xlim([0 time(end)])
     ylim([70 130])
+    set(gca,'fontname','times new roman','fontsize',16);
     hold on
     
     

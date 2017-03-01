@@ -76,7 +76,7 @@ nConstantTerrain = generate_terrain(nConstantTerrain,nConstantMT865);
 
 %% --------------- Set Simulation Integration Time Steps ------------------
 nTimeParam.timeStepS = 0.05;
-nTimeParam.simulationTime = 240;
+nTimeParam.simulationTime = 220;
 nTimeParam.time = [0:nTimeParam.timeStepS:nTimeParam.simulationTime].'; % Time array based on sample time and total simulation time
 nTimeParam.nTimeStep = size(nTimeParam.time,1); % Total number of time steps
 
@@ -181,7 +181,7 @@ controlArchitecture4 = controlArchitecture;
 
 
 %% ------------------------ Simulate Tractors -----------------------------
-%[tractor1, controlArchitecture1, inputMat1, nTimeParam1] = tractor_simulate(tractor1, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture1);
+% [tractor1, controlArchitecture1, inputMat1, nTimeParam1] = tractor_simulate(tractor1, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture1);
 
 j(1) = batch('tractor_simulate',4, {tractor1, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture1},...
     'CurrentFolder', '.',...

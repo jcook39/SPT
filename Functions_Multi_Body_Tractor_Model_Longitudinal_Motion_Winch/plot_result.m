@@ -1,4 +1,4 @@
-function plot_result(tractor,inputMat,lineStyle,nConstantMT865,nConstantTerrain,nTimeParam,plotContour)
+function plot_result(tractor,inputMat,lineStyle,nConstantMT865,nConstantTerrain,nTimeParam,plotContour,Xmax,Ymax)
 
 %% Unpack Constants
 trackAreaM2 = nConstantMT865.trackAreaM2;
@@ -154,8 +154,8 @@ end;
 %title('Friction Angle of Terrain')
 ylabel('North Position (meters)','interpreter','latex','fontsize',16)
 xlabel('East Position (meters)','interpreter','latex','fontsize',16)
-xlim([0 gridSizeXM])
-ylim([0 gridSizeYM])
+xlim([0 Xmax])
+ylim([0 Ymax])
 hold on
 
 figure(2)
@@ -193,6 +193,7 @@ ylabel('lateral position (m)')
 xlabel('longitudinal position (m)')
 xlim([0 200])
 ylim([0 100])
+set(gca,'fontname','times new roman','fontsize',16);
 hold on
 
 font = 16;

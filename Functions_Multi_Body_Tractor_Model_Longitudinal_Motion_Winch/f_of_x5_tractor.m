@@ -33,6 +33,7 @@ VH = nConstantMT865.volumeHighM3;
 VO = nConstantMT865.volumeLowM3;
 pMax = nConstantMT865.pressureHighMaxNM2;
 pSetValveH = nConstantMT865.pressureHighSetNM2;
+pressureMaxPumpNM2 = nConstantMT865.pressureMaxPumpNM2;
 qleak = nConstantMT865.leakFlowM3S;
 GRp = nConstantMT865.gearRatioPump;
 GRm = nConstantMT865.gearRatioMotor;
@@ -100,8 +101,8 @@ end
 
 if valvePos == 1
     % Displacement of Pump
-    Kpump = DpMax/(pMax - pSetDisPump);
-    Dp = DpMax*(hydPrH <= pSetDisPump) + (DpMax - Kpump*(hydPrH-pSetDisPump))*(pSetDisPump < hydPrH)*(hydPrH < pMax); % + 0*(hydPr >= pH);
+    Kpump = DpMax/(pressureMaxPumpNM2 - pSetDisPump);
+    Dp = DpMax*(hydPrH <= pSetDisPump) + (DpMax - Kpump*(hydPrH-pSetDisPump))*(pSetDisPump < hydPrH)*(hydPrH < pressureMaxPumpNM2); % + 0*(hydPr >= pH);
    % Load torque and Torque Out
     %Dp = DpMax*commandDisplacement;
     engTorq2AgPumpNM = Dp*hydPrH*(1/GRp);
