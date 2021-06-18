@@ -1,16 +1,21 @@
-function plot_terrain_hypothesis_2(structRBE, structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, tractorColor, hypothesisString, figureNo)
+function plot_terrain_hypothesis_2(tractorNo, structRBE, structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, estimateColor, tractorColor, hypothesisString, figureNo)
 % This function plots all terrain hypothesis for the Recursive Bayes
 % Estimator
 
 % --------------------- Color Declarations --------------------------------
 trueColor = 'b.';
-estimateColor = tractorColor;
 
 % ---------------------- Unpack Structures --------------------------------
 terrainHypotheses = structRBE.terrainHypotheses;
 terrainActual = nConstantTerrain.terrainActual;
 rollingRadiusM = nConstantMT865.rollingRadiusM;
 
+% ------------------------------ Unpack terrain ---------------------------
+terrainIndex = nConstantTerrain.indTrac(:,tractorNo);
+terrainActual = nConstantTerrain.terrainActual(:,terrainIndex);
+terrainStart = nConstantTerrain.terrainActual(:,terrainIndex(1,1));
+terrainMiddle = nConstantTerrain.terrainActual(:,terrainIndex(2,1));
+terrainEnd = nConstantTerrain.terrainActual(:,terrainIndex(3,1));
 
 % ------------------ Declare Dimensional Parameters -----------------------
 meter2inch = 39.3701;
@@ -65,6 +70,11 @@ for i = 1:nHypothesis
                  
 end % end for
 
+[F_TNetMatStart, ~, ~, tauResStart, ~] = net_track_force(terrainStart,nConstantMT865,slip);
+[F_TNetMatMiddle, ~, ~, tauResMiddle, ~] = net_track_force(terrainMiddle,nConstantMT865,slip);
+[F_TNetMatEnd, ~, ~, tauResEnd, ~] = net_track_force(terrainEnd,nConstantMT865,slip);
+
+
 %     figure(figureNo)
 %     subplot(231)
 %         plot( slip, F_TNetMat, slip, zeros(numel(slip),1),'k:' )
@@ -101,19 +111,22 @@ end % end for
 %         ylabel('sinkage (in)')
 %         hold on
 
+modelColor = 'k';
 if strcmp(hypothesisString, 'plotHypothesis')
 fontLabel = 16;        
     figure(figureNo+1)
     subplot(121)
-        plot( slip, F_TNetMat./1000)
+        plot( slip, F_TNetMat./1000,modelColor)
         ylabel('Net Traction $F_{net}$ (kN)','interpreter','latex','fontsize',fontLabel)
         xlabel('slip ratio (\%)','interpreter','latex','fontsize',fontLabel)
+        set(gca,'fontname','Times New Roman','fontsize',16)
         xlim([0 100])
         hold on
     subplot(122)
-        plot( slip, tauRes./1000 )
+        plot( slip, tauRes./1000,modelColor)
         ylabel('Resistance Torque $\tau_{res}$ (kN)','interpreter','latex','fontsize',fontLabel)
         xlabel('slip ratio (\%)','interpreter','latex','fontsize',fontLabel)
+        set(gca,'fontname','Times New Roman','fontsize',16)
         xlim([0 100])
         hold on
 end
@@ -123,7 +136,12 @@ fontLabel = 16;
     figure(figureNo+2)
     subplot(121)
         if strcmp(hypothesisString, 'plotHypothesis')
-            plot(slip, F_TNetMat./1000);
+            plot(slip, F_TNetMat./1000,modelColor)
+            hold on
+            h = plot(slip, F_TNetMatStart./1000, tractorColor, slip, F_TNetMatMiddle./1000, tractorColor, slip, F_TNetMatEnd./1000, tractorColor);
+            set(h(1),'linewidth',lineWidthSize);
+            set(h(2),'linewidth',lineWidthSize);
+            set(h(3),'linewidth',lineWidthSize);
             hold on
         end
         h = plot(slipHatSmooth, xHatPlus(3,indexVector)./1000, estimateColor);% slip, F_TNetMat);
@@ -131,11 +149,17 @@ fontLabel = 16;
         ylabel('Net Traction $F_{net}$ (kN)','interpreter','latex','fontsize',fontLabel)
         xlabel('slip ratio (\%)','interpreter','latex','fontsize',fontLabel)
         xlim([0 100])
+        set(gca,'fontname','Times New Roman','fontsize',16)
         hold on
         
     subplot(122)
         if strcmp(hypothesisString, 'plotHypothesis')
-            plot(slip, tauRes./1000);
+            plot(slip, tauRes./1000, modelColor)
+            hold on
+            h = plot(slip, tauResStart./1000, tractorColor, slip, tauResMiddle./1000, tractorColor, slip, tauResEnd./1000, tractorColor);
+            set(h(1),'linewidth',lineWidthSize);
+            set(h(2),'linewidth',lineWidthSize);
+            set(h(3),'linewidth',lineWidthSize);
             hold on
         end
         h = plot(slipHatSmooth, xHatPlus(5,indexVector)./1000, estimateColor );
@@ -143,6 +167,7 @@ fontLabel = 16;
         ylabel('Resistance Torque $\tau_{res}$ (kNm)','interpreter','latex','fontsize',fontLabel)
         xlabel('slip ratio (\%)','interpreter','latex','fontsize',fontLabel)
         xlim([0 100])
+        set(gca,'fontname','Times New Roman','fontsize',16)
         hold on
         
 end

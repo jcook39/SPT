@@ -141,7 +141,7 @@ end
     engTorq2TransNM = engTorqNM - engTorq2StrMotorNM - engTorq2AgPumpNM; 
     
 %% Calculate Forces at the Track
-[Fl,Fr,RL,RR,RlLF,RlRF,RlLR,RlRR,slipLeft,slipRight] = track_forces(x, MT865, nConstantMT865);
+[Fl,Fr,RL,RR,RlLF,RlRF,RlLR,RlRR,slipLeft,slipRight,sinkageLeftDynamic,sinkageRightDynamic] = track_forces(x, MT865, nConstantMT865);
 %fprintf('slipLeft: %d , slipRight: %d \n',slipLeft,slipRight)
 
 %% Wet Friction Clutch Dynamics and Logic
@@ -213,7 +213,7 @@ make_M_F();
 %% Put other values of interest into data structure
     if strcmp(outputCond,'else')
         % Other
-        MT865.forces = [Fl,Fr,RL,RR,RlLF,RlRF,RlLR,RlRR].' ;
+        MT865.forces = [Fl,Fr,RL,RR,RlLF,RlRF,RlLR,RlRR,sinkageLeftDynamic,sinkageRightDynamic].' ;
         MT865.slip = [slipLeft slipRight].';
         % Transmission
         MT865.transOutputSpeedRadSec = transOutSpdRadPS;

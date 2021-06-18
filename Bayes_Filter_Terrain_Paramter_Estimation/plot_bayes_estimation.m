@@ -160,7 +160,7 @@ subplot(121)
     set(h(2),'linewidth',lineWidthSize)
     ylim([5 30])
     xlim([0 time(end)])
-    ylabel('Peak Slip Smoothed(\%)','interpreter','latex','fontsize',fontLabel)
+    ylabel('Peak Slip (\%)','interpreter','latex','fontsize',fontLabel)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
     set(gca,'fontsize',fontLabel)
     set(gca,'fontname','times new roman','fontsize',16);

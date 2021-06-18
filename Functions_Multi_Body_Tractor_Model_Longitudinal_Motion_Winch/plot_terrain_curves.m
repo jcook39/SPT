@@ -54,25 +54,17 @@ slipVectorEstimate = 100*(1-(xHatPlus(1,indexVector)./(rollingRadiusM*xHatPlus(2
 slipVectorTrue = 100*(1-(x(1,indexVector)./(rollingRadiusM*x(2,indexVector))));
 slipVectorMeasure = 100*(1-(y(2,indexVector)./(rollingRadiusM*y(3,indexVector))));
 
-slip = 0.01:1.5:100;
+slip = 0.01:0.9:100;
 
 
 [F_TNetMatActSoft,FActSoft, RActSoft, tauResActSoft, sinkageActSoft] = net_track_force(terrainMiddle,nConstantMT865,slip);
-[~, ~, netTractionLoadTrueStart, ~] = peak_traction(nConstantMT865, terrainStart, slip, 'AllTraction');
-[~, ~, netTractionLoadTrueMiddle, ~] = peak_traction(nConstantMT865, terrainMiddle, slip, 'AllTraction');
-[~, ~, netTractionLoadTrueEnd, ~] = peak_traction(nConstantMT865, terrainEnd, slip, 'AllTraction');
+[netTractionNoLoadTrueStart, ~, netTractionLoadTrueStart, ~] = peak_traction(nConstantMT865, terrainStart, slip, 'AllTraction');
+[netTractionNoLoadTrueMiddle, ~, netTractionLoadTrueMiddle, ~] = peak_traction(nConstantMT865, terrainMiddle, slip, 'AllTraction');
+[netTractionNoLoadTrueEnd, ~, netTractionLoadTrueEnd, ~] = peak_traction(nConstantMT865, terrainEnd, slip, 'AllTraction');
 
 
 figure(figureNoAll)
-subplot(131)
-    h = plot(slip, zeros(numel(slip),1),'k:',slip, netTractionLoadTrueStart./1000,tractorColor);
-    set(gca,'fontname','Times New Roman','fontsize',16)
-    set(h(1),'LineWidth',2)
-    set(h(2),'LineWidth',2)
-    ylabel('net traction with payload (kN) start terrain','interpreter','latex','fontsize',16)
-    xlabel('slip ratio $i$ (\%)','interpreter','latex','fontsize',16)  
-    hold on
-subplot(132)
+subplot(121)
     h = plot(slip, zeros(numel(slip),1),'k:',slip, netTractionLoadTrueMiddle./1000,tractorColor);
     set(gca,'fontname','Times New Roman','fontsize',16)
     set(h(1),'LineWidth',2)
@@ -80,20 +72,41 @@ subplot(132)
     ylabel('net traction with payload (kN) middle terrain','interpreter','latex','fontsize',16)
     xlabel('slip ratio $i$ (\%)','interpreter','latex','fontsize',16)  
     hold on
-subplot(133)
+subplot(122)
     h = plot(slip, zeros(numel(slip),1),'k:',slip, netTractionLoadTrueEnd./1000,tractorColor);
     set(gca,'fontname','Times New Roman','fontsize',16)
+    set(gca,'yaxislocation','right');
     set(h(1),'LineWidth',2)
     set(h(2),'LineWidth',2)
     ylabel('net traction with payload (kN) end terrain','interpreter','latex','fontsize',16)
     xlabel('slip ratio $i$ (\%)','interpreter','latex','fontsize',16)  
     hold on
     
+    
+figure(figureNoAll + 1)
+    h = plot(slip, zeros(numel(slip),1),'k:',slip, netTractionNoLoadTrueMiddle./1000,tractorColor);
+    set(gca,'fontname','Times New Roman','fontsize',20)
+    set(h(1),'LineWidth',2)
+    set(h(2),'LineWidth',2)
+    ylabel('$F - R_c$ (kN)','interpreter','latex','fontsize',20)
+    xlabel('slip ratio $i$ (\%)','interpreter','latex','fontsize',20)  
+    hold on
+    
+figure(figureNoAll + 2)
+    h = plot(slip, zeros(numel(slip),1),'k:',slip, netTractionLoadTrueMiddle./1000,tractorColor);
+    set(gca,'fontname','Times New Roman','fontsize',16)
+    set(h(1),'LineWidth',2)
+    set(h(2),'LineWidth',2)
+    ylabel('$F - R_c - DB$ (kN)','interpreter','latex','fontsize',16)
+    xlabel('slip ratio $i$ (\%)','interpreter','latex','fontsize',16)  
+    hold on    
+    
 
 nActualTerrain = size(terrainActual,2);
 for i = 1:nActualTerrain
     [F_TNetMatAct(:,i),FAct(:,i), RAct(:,i), tauResAct(:,i), sinkageAct(:,i)] = net_track_force(terrainActual(:,i),nConstantMT865,slip);
     [~, ~, netTractionLoadMatTrue(:,i), ~] = peak_traction(nConstantMT865, terrainActual(:,i), slip, 'AllTraction');
+    
 end % end for
 
     figure(figureNo+3)
@@ -133,8 +146,6 @@ end % end for
         ylabel('Net Traction with PayLoad (N)')
         xlabel('slip ratio')        
 
-        
-        
         
 % 
 %     fontLabel = 16;

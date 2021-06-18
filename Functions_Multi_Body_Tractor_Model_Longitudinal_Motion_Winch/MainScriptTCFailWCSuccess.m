@@ -19,7 +19,7 @@ nConstantMT865 = initialize_constant_tractors_parameters(resCoeff,bladderNo);
 % --------------------------- Tractor1 ------------------------------------
 nConstantTerrain.indTrac(:,1) = [1:3].';
 nConstantTerrain.nLocX(1:3,1:2) = [0 30; 30 130; 130 1000]; 
-nConstantTerrain.nLocY(1:3,1:2) = [0 10; 0 10; 0 10];
+nConstantTerrain.nLocY(1:3,1:2) = [-50 50; -50 50; -50 50];
 % Terrain Vectors for each boundry
 nConstantTerrain.cohesion(1:3,1) = [6.1 3 8].'; 
 nConstantTerrain.frictionAngle(1:3,1) = [20 17.8 20].';
@@ -123,7 +123,7 @@ controlArchitecture1 = controlArchitecture;
 Xmax = 350;
 Ymax = 10 ;
 plotTerrain = 1;
-plot_result(tractor1,inputMat1,'r',nConstantMT865,nConstantTerrain, nTimeParam1, plotTerrain, Xmax, Ymax)
+plot_result(tractor1,inputMat1,'r',nConstantMT865,nConstantTerrain, nTimeParam1, controlArchitecture1.structTractionController, plotTerrain, Xmax, Ymax)
 
 controlArchitecture1.structDTKF.plotSmooth = 'noPlotSmooth';
 plot_DTKF_result(controlArchitecture1.structDTKF, 1, 1:2,nConstantTerrain, nConstantMT865, nTimeParam, 305);
@@ -134,9 +134,17 @@ plot_DTKF_result(controlArchitecture1.structDTKF, 1, 1:2,nConstantTerrain, nCons
 
 plot_terrain_curves(controlArchitecture1.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam1, 1, 502, 530, 'r')
 
-plot_terrain_hypothesis_2(controlArchitecture1.structRBE, controlArchitecture1.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'r.', 'plotHypothesis', 522)
+plot_terrain_hypothesis_2(1,controlArchitecture1.structRBE, controlArchitecture1.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'r.','r', 'plotHypothesis', 522)
 
 
 plot_bayes_estimation(tractor1, controlArchitecture1.structRBE, nConstantMT865, nTimeParam1, 'r.', 'r', 'plotHist', 605)
 
 plot_traction_control( tractor1, nConstantMT865, controlArchitecture1.structTractionController, controlArchitecture1.structDTKF, inputMat1, nTimeParam, 1, 800)
+
+
+videoType = 'video'; % 'matlab' to play back in matlab, 'video' for windows video file
+plotTerrain = 'no';
+nTractor.tractorOne = tractor1;
+nTractorColor.tractorOneColor = 'r.';
+simulation_video( nTractor, nTractorColor, inputMat1, nConstantMT865, nConstantTerrain, controlArchitecture1.structTractionController,...
+    nTimeParam.timeStepS, nTimeParam.nTimeStep ,videoType, plotTerrain, 'tractorThesisPresRealTime5.avi');

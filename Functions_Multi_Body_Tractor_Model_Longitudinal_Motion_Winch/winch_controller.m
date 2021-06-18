@@ -291,3 +291,8 @@ elseif valvePosition == 1
     end
 end
 end
+
+function pSet = controller_logic_valve_2(slipUpperLimit2nd, slipUpperLimit3rd, slipHasBeenAbove2ndUpperLimit,...
+    slipHasBeenAbove3rdUpperLimit, tractorIsBelowMaxSlipThreshold, pSet  )
+
+end

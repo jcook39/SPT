@@ -88,7 +88,7 @@ MT865.state = state;
 
 % Other
 MT865.slip = [slipLeft slipRight].';
-MT865.forces = zeros(8,1);
+MT865.forces = zeros(10,1);
 
 % Transmission
 MT865.transOutputSpeedRadSec = 0;

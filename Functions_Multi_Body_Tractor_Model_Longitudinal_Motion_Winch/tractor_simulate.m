@@ -21,7 +21,7 @@ for timeStepNo = 2:nTimeStep
    %[tractor(timeStepNo)] = detect_valve_change(tractor(timeStepNo),inputMat(timeStepNo,:),inputMat(timeStepNo-1,:)); 
   
    if structDTKF.FlagDTKFisOn
-   structDTKF = propogate_DTKF(structDTKF, tractor(timeStepNo), nConstantMT865, inputMat(timeStepNo-1,:).', timeStepNo, 'Koffline');
+   structDTKF = propogate_DTKF(structDTKF, tractor(timeStepNo), nConstantMT865, inputMat(timeStepNo-1,:).', timeStepNo, 'Konline');
    end
    
    if structRBE.FlagRBEisOn

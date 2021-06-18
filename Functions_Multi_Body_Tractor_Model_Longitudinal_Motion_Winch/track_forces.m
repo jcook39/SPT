@@ -1,4 +1,4 @@
-function [Fl,Fr,RL,RR,RlLF,RlRF,RlLR,RlRR,slipLeft,slipRight] = track_forces(state, MT865, nConstantMT865)
+function [Fl,Fr,RL,RR,RlLF,RlRF,RlLR,RlRR,slipLeft,slipRight,sinkageLeftDynamic,sinkageRightDynamic] = track_forces(state, MT865, nConstantMT865)
 
 %Track Forces model form Theory of Ground Vehicles Wong 1st Ed. , pg 111-113 ex 2.1
 

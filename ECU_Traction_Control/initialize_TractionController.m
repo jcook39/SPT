@@ -22,6 +22,7 @@ sysControllerD = c2d(sysControllerC,controllerSampleTime,'tustin');
 % ----------------- Package controller structure --------------------------
 structTractionController.KpGR = KpGR;
 structTractionController.KiGR = KiGR;
+structTractionController.KdGR = KdGR;
 
 structTractionController.errorOmegaIntegrated = zeros(nTimeStep,1);
 structTractionController.errorOmega = zeros(nTimeStep,1);
@@ -42,6 +43,7 @@ structTractionController.gearNo = zeros(nTimeStep,1);
 
 structTractionController.gearShiftFlag = zeros(nTimeStep,1);
 structTractionController.sysControllerD = sysControllerD;
+structTractionController.sysControllerC = sysControllerC;
 
 % --------------- Traction Control is On ----------------------------------
 structTractionController.FlagTCisOn = 1;

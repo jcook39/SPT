@@ -18,7 +18,7 @@ time = nTimeParam.time;
 
 indexVector = 1:nTimeStep;
 timeVector = (indexVector-1)*timeStepS;
-simulationTime = nTimeParam.simulationTime;
+simulationTime = timeVector(end);
 
 % ----------------------- Unpack Tractor Parameters -----------------------
 rollingRadiusM = nConstantMT865.rollingRadiusM;
@@ -34,9 +34,9 @@ xHatPlus = structDTKF.xHatPlus;
 xError = structDTKF.xError;
 y = structDTKF.y;
 
-smoothedvHat = structDTKF.smoothedvHat;
-slipHat = structDTKF.slipHat;
-slipHatSmooth = structDTKF.slipHatSmooth;
+smoothedvHat = structDTKF.smoothedvHat(indexVector);
+slipHat = structDTKF.slipHat(indexVector);
+slipHatSmooth = structDTKF.slipHatSmooth(indexVector);
 
 slipVectorTrue = 100*(1-(x(1,indexVector)./(rollingRadiusM*x(2,indexVector))));
 slipVectorMeasure = 100*(1-(y(2,indexVector)./(rollingRadiusM*y(3,indexVector))));
@@ -147,12 +147,13 @@ subplot(321)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
     set(gca,'FontSize',fontLabel,'FontName','Times New Roman')
     set(gca,'xlim',[0 simulationTime])
+    set(gca,'ylim',[0 2])
     %if strcmp(structDTKF.plotSmooth, 'plotSmooth')
     %    legend('True Value','Estimated Value','Measured Value','Smoothed Estimated Value','Location','NorthEast')
     %else
     %    legend('True Value','Estimated Value','Measured Value','Location','NorthEast')
     %end
-    grid on
+    %grid on
 subplot(322)    
     h = plot(timeVector,x(2,indexVector),trueColor,timeVector,xHatPlus(2,indexVector),estimateColor,timeVector,y(3,indexVector),measureColor);
     set(h(1),'linewidth',lineWidthSize)
@@ -162,7 +163,7 @@ subplot(322)
     set(gca,'FontSize',fontLabel,'FontName','Times New Roman')
     set(gca,'xlim',[0 simulationTime])
     ylim([0 4])
-    grid on
+    %grid on
 subplot(323)    
     h = plot(timeVector,slipVectorTrue,trueColor,timeVector,slipHat,estimateColor,...
         timeVector,slipVectorMeasure,measureColor,timeVector,slipHatSmooth,smoothColor);
@@ -175,7 +176,7 @@ subplot(323)
     set(gca,'xlim',[0 simulationTime])
     ylim([-10 100])
     %legend('True Value','Estimated Value','Measured Value')
-    grid on
+    %grid on
 subplot(324)    
     h = plot(timeVector,x(3,indexVector)./1000,trueColor,timeVector,xHatPlus(3,indexVector)./1000,estimateColor);
     set(h(1),'linewidth',lineWidthSize)
@@ -184,7 +185,7 @@ subplot(324)
     set(gca,'yaxislocation','right');
     set(gca,'FontSize',fontLabel,'FontName','Times New Roman')
     set(gca,'xlim',[0 simulationTime])
-    grid on
+    %grid on
 subplot(325)    
     h = plot(timeVector,x(5,indexVector)./1000,trueColor,timeVector,xHatPlus(5,indexVector)./1000,estimateColor);
     set(h(1),'linewidth',lineWidthSize)
@@ -192,7 +193,7 @@ subplot(325)
     xlabel('time (seconds)','interpreter','latex','fontsize',fontLabel)
     set(gca,'FontSize',fontLabel,'FontName','Times New Roman')
     set(gca,'xlim',[0 simulationTime])
-    grid on
+    %grid on
 subplot(326)
     h = plot(timeVector,x(7,indexVector)./1000,trueColor,timeVector,xHatPlus(7,indexVector)./1000,estimateColor,...
         timeVector,y(4,indexVector)./1000,measureColor);
@@ -202,7 +203,7 @@ subplot(326)
     set(gca,'yaxislocation','right');
     set(gca,'FontSize',fontLabel,'FontName','Times New Roman')
     set(gca,'xlim',[0 simulationTime])
-    grid on
+    %grid on
     
     
 slip = 0.01:1.5:100;
@@ -227,6 +228,7 @@ subplot(122)
     set(gca,'FontSize',fontLabel,'FontName','Times New Roman')
     ylabel('Resistive Torque, $\tau_{Res}$ (kNm)','interpreter','latex','fontsize',fontLabel)
     xlabel('slip ratio, i (\%)','interpreter','latex','fontsize',fontLabel)
+    set(gca,'yaxislocation','right');
 
 
     

@@ -4,6 +4,7 @@
 %% Add Paths for common functions
 addpath('/Users/joshuacook/Desktop/Final_Tractor_Models_Code/Functions_All_Models')
 addpath('/Users/joshuacook/Desktop/Final_Tractor_Models_Code/Functions_Multi-Body_Tractor Model_Without_Winch')
+addpath('/Users/joshuacook/Desktop/Final_Tractor_Models_Code/Unscented_Filter_Leader_Follower')
 
 %% Clear Work Space and Close Existing Windows
 clear, clc, close all
@@ -73,13 +74,13 @@ wayPointTimeStepS = 1; % 1/Hz
 tractorOneX = 120; % lateral position (m)
 tractorOneY = 210; % longitudinal position (m)
 tractorOneTheta = 0; % course or yaw angle (rad)
-tractorOneColor = 'r';
+tractorOneColor = 'k.';
 
 tractorTwoPos = [tractorOneX tractorOneY 0].' + rotation_matrix_z(tractorOneTheta)*[refDlong refDlat  0].';
 tractorTwoX = tractorTwoPos(1,1); % lateral position (m)
 tractorTwoY = tractorTwoPos(2,1); % longitudinal position (m)
 tractorTwoTheta = tractorOneTheta; % course or yaw angle (rad)
-tractorTwoColor = 'b';
+tractorTwoColor = 'b.';
 tractorTwoColorWayPoint =  'bx';
 
 %% Initialize Structure of Time Varying Tractor Torques, Forces, Inputs, States
@@ -108,10 +109,12 @@ for timeStepNo = 2:nTimeStep
 end
 
 %% %%%%%%%%%%%%%%%%%%%% SHOW RESULTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+UKFStruct = UKF(tractorOne, tractorTwo , simulationTime, timeStepS);
 
-plot_result(tractorOne,inputMatOne,'r',nTimeStep,nConstantTerrain,nConstantMT865,timeStepS,tractorOneColor,'plotContour');
-plot_way_points(waypoint,nWayPointFollowEval,'kx','wo');
-plot_result(tractorTwo,inputMatTwo,'b:',nTimeStep,nConstantTerrain,nConstantMT865,timeStepS,tractorTwoColor,0);
+
+%plot_result(tractorOne,inputMatOne,'r',nTimeStep,nConstantTerrain,nConstantMT865,timeStepS,tractorOneColor,'plotContour');
+%plot_way_points(waypoint,nWayPointFollowEval,'kx','wo');
+%plot_result(tractorTwo,inputMatTwo,'b:',nTimeStep,nConstantTerrain,nConstantMT865,timeStepS,tractorTwoColor,0);
 %latex_figures()
 
 
@@ -119,11 +122,11 @@ plot_result(tractorTwo,inputMatTwo,'b:',nTimeStep,nConstantTerrain,nConstantMT86
 %plot_follower_speed_heading_control(controllerFollowOne,timeStepS,nTimeStep)
 
 
-%  
-% videoType = 'video'; % 'matlab' to play back in matlab, 'video' for windows video file
-% plotTerrain = 'yes';
-% nTractor.tractorOne = tractorOne;
-% nTractor.tractorTwo = tractorTwo;
-% nTractorColor.tractorOneColor = tractorOneColor;
-% nTractorColor.tractorTwoColor = tractorTwoColor;
-% simulation_video( nTractor, nTractorColor, nConstantMT865, nConstantTerrain, waypoint, timeStepS, nTimeStep ,videoType, plotTerrain, 'tractorTestJoT.avi');
+videoType = 'video'; % 'matlab' to play back in matlab, 'video' for windows video file
+plotTerrain = 'no';
+nTractor.tractorOne = tractorOne;
+nTractor.tractorTwo = tractorTwo;
+nTractorColor.tractorOneColor = tractorOneColor;
+nTractorColor.tractorTwoColor = tractorTwoColor;
+%simulation_video( nTractor, nTractorColor, nConstantMT865, nConstantTerrain, waypoint, timeStepS, nTimeStep ,videoType, plotTerrain, 'tractorThesisLeaderFollower.avi');
+simulation_video_UKF( nTractor, nTractorColor, nConstantMT865, nConstantTerrain, waypoint, timeStepS, nTimeStep ,videoType, plotTerrain, 'tractorUKFLeaderFollower.avi', UKFStruct);

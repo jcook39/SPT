@@ -25,6 +25,7 @@ nConstantMT865.trackCG2trackCG = 2.985;
 nConstantMT865.tractorIntertiaKGM2 = 150000;
 nConstantMT865.tractorCG2WinchM = 2.75;
 
+
 % Engine Data/Parameters
 nConstantMT865.engineTorqueDataNM = [2530 2530 2512 2468 2364 2244 2128 1960 1781 1547 1335];
 nConstantMT865.engineSpeedDataRadPS = [1300:100:2300].*((2*pi)/60);

@@ -85,8 +85,8 @@ structDTKF.nMeasure = nMeasure;
 
 structDTKF.engineThrottleSignalNoiseVariance = 1.57e-6;
 
-load('Koffline.mat')
-structDTKF.Koffline = Koffline;
+%load('Koffline.mat')
+%structDTKF.Koffline = Koffline;
 
 % Velocity Filter/Smoother
 structDTKF.smootherAd = smootherAd;

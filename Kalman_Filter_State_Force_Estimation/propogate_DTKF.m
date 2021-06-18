@@ -29,7 +29,7 @@ xHatPlus = structDTKF.xHatPlus;
 PPlus = structDTKF.PPlus;
 PMinus = structDTKF.PMinus;
 K = structDTKF.K;
-Koffline = structDTKF.Koffline;
+%Koffline = structDTKF.Koffline;
 
 nState = structDTKF.nState;
 nMeasure = structDTKF.nMeasure;

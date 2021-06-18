@@ -219,10 +219,13 @@ wait(j(4));
 [tractor4, controlArchitecture4, inputMat4, nTimeParam4] = unpack_tractor_sim_outptus(j(4));
 
 %---------------------------- Plot Result -------------------------------
-plot_result(tractor1,inputMat1,'r',nConstantMT865,nConstantTerrain, nTimeParam1, 1)
-plot_result(tractor2,inputMat2,'b',nConstantMT865,nConstantTerrain, nTimeParam2, 0)
-plot_result(tractor3,inputMat3,'g',nConstantMT865,nConstantTerrain, nTimeParam3, 0)
-plot_result(tractor4,inputMat4,'c',nConstantMT865,nConstantTerrain, nTimeParam4, 0)
+Xmax = 650;
+Ymax = 40 ;
+plotTerrain = 1;
+plot_result(tractor1,inputMat1,'r',nConstantMT865,nConstantTerrain, nTimeParam1, controlArchitecture1.structTractionController, plotTerrain, Xmax, Ymax)
+plot_result(tractor2,inputMat2,'b',nConstantMT865,nConstantTerrain, nTimeParam2, controlArchitecture2.structTractionController, 1, Xmax, Ymax)
+plot_result(tractor3,inputMat3,'g',nConstantMT865,nConstantTerrain, nTimeParam3, controlArchitecture3.structTractionController, 1, Xmax, Ymax)
+plot_result(tractor4,inputMat4,'c',nConstantMT865,nConstantTerrain, nTimeParam4, controlArchitecture4.structTractionController, 1, Xmax, Ymax)
 
 controlArchitecture1.structDTKF.plotSmooth = 'noPlotSmooth';
 plot_DTKF_result(controlArchitecture1.structDTKF, 1, 1:2,nConstantTerrain, nConstantMT865, nTimeParam, 305);
@@ -237,6 +240,9 @@ plot_terrain_hypothesis_2(controlArchitecture1.structRBE, controlArchitecture1.s
 plot_terrain_hypothesis_2(controlArchitecture2.structRBE, controlArchitecture2.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'b.', 'noPlotHypothesis',522)
 plot_terrain_hypothesis_2(controlArchitecture3.structRBE, controlArchitecture3.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'g.', 'noPlotHypothesis', 522)
 plot_terrain_hypothesis_2(controlArchitecture4.structRBE, controlArchitecture4.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'c.', 'noPlotHypothesis', 522)
+
+plot_terrain_hypothesis_2(controlArchitecture1.structRBE, controlArchitecture1.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'r.', 'plotHypothesis', 522)
+
 
 plot_bayes_estimation(tractor1, controlArchitecture1.structRBE, nConstantMT865, nTimeParam1, 'r.', 'r', 'noPlotHist', 605)
 plot_bayes_estimation(tractor2, controlArchitecture2.structRBE, nConstantMT865, nTimeParam2, 'b.', 'b', 'noPlotHist', 605)

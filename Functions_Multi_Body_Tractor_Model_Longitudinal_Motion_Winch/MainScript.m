@@ -210,11 +210,13 @@ controlArchitecture5 = controlArchitecture;
 [tractor5, controlArchitecture5, inputMat5, nTimeParam5] = tractor_simulate(tractor5, inputMat1, nConstantMT865, nConstantTerrain, nTimeParam, controlArchitecture5);
 
 %---------------------------- Plot Result -------------------------------
-plot_result(tractor1,inputMat1,'r',nConstantMT865,nConstantTerrain, nTimeParam1, 1)
-plot_result(tractor2,inputMat2,'b',nConstantMT865,nConstantTerrain, nTimeParam2, 0)
-plot_result(tractor3,inputMat3,'g',nConstantMT865,nConstantTerrain, nTimeParam3, 0)
-plot_result(tractor4,inputMat4,'c',nConstantMT865,nConstantTerrain, nTimeParam4, 0)
-plot_result(tractor5,inputMat5,'m',nConstantMT865,nConstantTerrain, nTimeParam5, 0)
+Ymax = 50;
+Xmax = 150;
+plot_result(tractor1,inputMat1,'r',nConstantMT865,nConstantTerrain, nTimeParam1, controlArchitecture1.structTractionController, 1, Xmax, Ymax)
+plot_result(tractor2,inputMat2,'b',nConstantMT865,nConstantTerrain, nTimeParam2, controlArchitecture2.structTractionController, 0, Xmax, Ymax)
+plot_result(tractor3,inputMat3,'g',nConstantMT865,nConstantTerrain, nTimeParam3, controlArchitecture3.structTractionController, 0, Xmax, Ymax)
+plot_result(tractor4,inputMat4,'c',nConstantMT865,nConstantTerrain, nTimeParam4, controlArchitecture4.structTractionController, 0, Xmax, Ymax)
+plot_result(tractor5,inputMat5,'m',nConstantMT865,nConstantTerrain, nTimeParam5, controlArchitecture5.structTractionController, 0, Xmax, Ymax)
 
 controlArchitecture1.structDTKF.plotSmooth = 'noPlotSmooth';
 plot_DTKF_result(controlArchitecture1.structDTKF, 1, 1:2,nConstantTerrain, nConstantMT865, nTimeParam, 305);
@@ -230,11 +232,11 @@ plot_terrain_curves(controlArchitecture4.structDTKF, nConstantMT865, nConstantTe
 plot_terrain_curves(controlArchitecture5.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam5, 5, 518, 530, 'm')
 
 
-plot_terrain_hypothesis_2(controlArchitecture1.structRBE, controlArchitecture1.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'r.', 'plotHypothesis', 522)
-plot_terrain_hypothesis_2(controlArchitecture2.structRBE, controlArchitecture2.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'b.', 'noPlotHypothesis',522)
-plot_terrain_hypothesis_2(controlArchitecture3.structRBE, controlArchitecture3.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'g.', 'noPlotHypothesis', 522)
-plot_terrain_hypothesis_2(controlArchitecture4.structRBE, controlArchitecture4.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'c.', 'noPlotHypothesis', 522)
-plot_terrain_hypothesis_2(controlArchitecture5.structRBE, controlArchitecture5.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'm.', 'noPlotHypothesis', 522)
+plot_terrain_hypothesis_2(1,controlArchitecture1.structRBE, controlArchitecture1.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'r.', 'r', 'plotHypothesis', 522)
+plot_terrain_hypothesis_2(2,controlArchitecture2.structRBE, controlArchitecture2.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'b.', 'b', 'plotHypothesis', 530)
+plot_terrain_hypothesis_2(3,controlArchitecture3.structRBE, controlArchitecture3.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'g.', 'g', 'plotHypothesis', 540)
+plot_terrain_hypothesis_2(4,controlArchitecture4.structRBE, controlArchitecture4.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'c.', 'c', 'plotHypothesis', 550)
+plot_terrain_hypothesis_2(5,controlArchitecture5.structRBE, controlArchitecture5.structDTKF, nConstantMT865, nConstantTerrain, nTimeParam, 'm.', 'm', 'plotHypothesis', 560)
 
 
 plot_bayes_estimation(tractor1, controlArchitecture1.structRBE, nConstantMT865, nTimeParam1, 'r.', 'r', 'plotHist', 605)

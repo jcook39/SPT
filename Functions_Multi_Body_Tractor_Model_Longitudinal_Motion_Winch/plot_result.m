@@ -1,4 +1,4 @@
-function plot_result(tractor,inputMat,lineStyle,nConstantMT865,nConstantTerrain,nTimeParam,plotContour,Xmax,Ymax)
+function plot_result(tractor, inputMat, lineStyle, nConstantMT865, nConstantTerrain, nTimeParam, structTractionController, plotContour, Xmax, Ymax)
 
 %% Unpack Constants
 trackAreaM2 = nConstantMT865.trackAreaM2;
@@ -9,6 +9,7 @@ RsledN = nConstantMT865.RsledN;
 nTimeStep = nTimeParam.nTimeStep;
 timeStepS = nTimeParam.timeStepS;
 time = nTimeParam.time;
+simulationTime = time(nTimeStep);
 
 indexVector = 1:nTimeStep;
 timeVector = time(indexVector);
@@ -77,6 +78,9 @@ for i = 1:nTimeStep
     Fr(i) = tractor(i).forces(2);
     RL(i) = tractor(i).forces(3);
     RR(i) = tractor(i).forces(4);
+    %sinkageLeftDynamic(i) = tractor(i).forces(9);
+    %sinkageRightDynamic(i) = tractor(i).forces(10);
+    
     
     %Terrain Parameters
     terrainCohesion(i) = tractor(i).terrainLeftFront(1);
@@ -108,15 +112,18 @@ contourY = nConstantTerrain.Y;
 frictionAngle = nConstantTerrain.terrainFrictionAngle;
 cohesion = nConstantTerrain.terrainCohesion;
 
+%% Traction Control
+tractionControlIsOn = structTractionController.tractionControlIsOn;
+
 %% Spatial Plots
 timeStepVehicle = 10; % seconds
 incVehicle = timeStepVehicle/timeStepS;
 
 figure(1)
 if plotContour
-contourf(contourX,contourY,frictionAngle,'edgecolor','none')
-caxis([0 30])
-colormap winter
+contourf(contourX,contourY,nConstantTerrain.terrainkeq,'edgecolor','none')
+caxis([200 600])
+colormap gray
 %colorbar('EastOutside')
 end
 hold on
@@ -152,8 +159,9 @@ for i=1:incVehicle:nTimeStep
   
 end;
 %title('Friction Angle of Terrain')
-ylabel('North Position (meters)','interpreter','latex','fontsize',16)
+%ylabel('North Position (meters)','interpreter','latex','fontsize',16)
 xlabel('East Position (meters)','interpreter','latex','fontsize',16)
+set(gca,'fontname','times new roman','fontsize',16)
 xlim([0 Xmax])
 ylim([0 Ymax])
 hold on
@@ -196,52 +204,202 @@ ylim([0 100])
 set(gca,'fontname','times new roman','fontsize',16);
 hold on
 
+lineWidthSize = 2; 
 font = 16;
 row1000 = 3;
 col1000 = 2;
 figure(1000)
 subplot(row1000,col1000,1)
-    plot(timeVector,X(indexVector),lineStyle)
+    h = plot(timeVector,X(indexVector),lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
     ylabel('$X\hspace{2mm}(m)$','interpreter','latex','fontname','timesnewroman','fontsize',font)
     xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlim([0 max(timeVector)])
     set(gca,'fontname','times new roman','fontsize',16);
     hold on
 subplot(row1000,col1000,2)
-    plot(timeVector,vx(indexVector),lineStyle)
+    h = plot(timeVector,vx(indexVector),lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
     ylabel('$v_T\hspace{2mm}(m/s)$','interpreter','latex','fontname','timesnewroman','fontsize',font)
     xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlim([0 max(timeVector)])
     set(gca,'yaxislocation','right');
     set(gca,'fontname','times new roman','fontsize',16);
     hold on
 subplot(row1000,col1000,3)
-    plot(timeVector,engSpdRadPS(indexVector).*((60)/(2*pi)),lineStyle)
+    h = plot(timeVector,engSpdRadPS(indexVector).*((60)/(2*pi)),lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
     ylim([1000 2300])
     ylabel('$\Omega_E\hspace{2mm}(RPM)$','interpreter','latex','fontname','timesnewroman','fontsize',font)
     xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlim([0 max(timeVector)])
     set(gca,'fontname','times new roman','fontsize',16)
     hold on
 subplot(row1000,col1000,4)
-    plot(timeVector,gear(indexVector),lineStyle)
+    h = plot(timeVector,gear(indexVector),lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
     ylabel('$g_{GR}$','interpreter','latex','fontname','timesnewroman','fontsize',font) 
     xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlim([0 max(timeVector)])
     set(gca,'yaxislocation','right');
     set(gca,'fontname','times new roman','fontsize',16)
     hold on
 subplot(row1000,col1000,5)
-    plot(timeVector,slipLeft(indexVector),lineStyle)
+    h = plot(timeVector,slipLeft(indexVector),lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
     ylim([0 50])
     ylabel('$i,\hspace{1mm}(\%)$','interpreter','latex','fontname','times new roman','fontsize',font)
     xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlim([0 max(timeVector)])
     set(gca,'fontname','times new roman','fontsize',16)
     hold on
 subplot(row1000,col1000,6)
-    plot(timeVector,engThrtlState,lineStyle)
+    h = plot(timeVector,engThrtlState,lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
     ylabel('$\Pi$','interpreter','latex','fontname','times new roman','fontsize',font)
     xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlim([0 max(timeVector)])
     set(gca,'yaxislocation','right');
     set(gca,'fontname','times new roman','fontsize',16)
     ylim([0 1])
     hold on
+       
+
+minVec = [0.09 0.09];
+maxVec = [0.95 0.95];
+AX = [0.025 0.025];
+font = 16;
+row1001 = 4;
+col1001 = 2;
+figure(1001)
+if plotContour
+subplot1(4,2,'Gap',AX,'YTickL','All','Min',minVec,'Max',maxVec,'FontS',font)
+end
+subplot1(1)
+    h = plot(timeVector,engSpdRadPS(indexVector).*((60)/(2*pi))*(1/1000),lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
+    ylim([1.3 2.1])
+    ylabel('$\Omega_E\hspace{2mm}(RPM\times 1000)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlim([0 max(timeVector)])
+    set(gca,'fontname','times new roman','fontsize',16)
+    hold on
+subplot1(2)
+    h = plot(timeVector,tractionControlIsOn(indexVector), lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
+    set(gca,'fontname','times new roman','fontsize',16)
+    set(gca,'yaxislocation','right');
+subplot1(3)
+    h = plot(timeVector,gear(indexVector),lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
+    ylabel('$g_{GR}$','interpreter','latex','fontname','times new roman','fontsize',font) 
+    xlim([0 max(timeVector)])
+    set(gca,'yaxislocation','left');
+    set(gca,'fontname','times new roman','fontsize',16)
+    hold on
+subplot1(4)
+    h = plot(timeVector,slipLeft(indexVector),lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
+    ylim([0 50])
+    ylabel('$i,\hspace{1mm}(\%)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlim([0 max(timeVector)])
+    set(gca,'fontname','times new roman','fontsize',16)
+    set(gca,'yaxislocation','right');
+    hold on
+subplot1(5)
+    h = plot(timeVector,engThrtlState,lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
+    ylabel('$\Pi$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlim([0 max(timeVector)])
+    set(gca,'yaxislocation','left');
+    set(gca,'fontname','times new roman','fontsize',16)
+    ylim([0 1])
+    hold on 
+subplot1(6)
+    h = plot(timeVector,hydPressureH(indexVector)./(1E6),lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
+    ylabel('$P_H\hspace{2mm}(MPa)$','interpreter','latex','fontname','times new roman','fontsize',font) 
+    xlim([0 max(timeVector)])
+    ylim([0 20])
+    set(gca,'yaxislocation','right');
+    set(gca,'fontname','times new roman','fontsize',16)
+    hold on
+subplot1(7)
+    h = plot(timeVector,hydPressureO(indexVector)./(1E6),lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
+    ylabel('$P_O\hspace{2mm}(MPa)$','interpreter','latex','fontname','times new roman','fontsize',font) 
+    xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlim([0 max(timeVector)])
+    set(gca,'yaxislocation','left');
+    set(gca,'fontname','times new roman','fontsize',16)
+    ylim([0 20])
+    hold on
+subplot1(8)
+    h = plot(timeVector,engTorq2AgPumpNM(indexVector),lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
+    ylabel('${\tau_{load}}\hspace{2mm}(Nm)$','interpreter','latex','fontsize',font)
+    xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlim([0 max(timeVector)])
+    set(gca,'yaxislocation','right');
+    set(gca,'fontname','times new roman','fontsize',16)
+    hold on
+
+AX = [0.025 0.025];
+font = 16;
+figure(1002)
+if plotContour
+subplot1(3,2,'Gap',AX,'YTickL','All','Min',minVec,'Max',maxVec,'FontS',font)
+end
+subplot1(1)
+    h = plot(timeVector,X(indexVector),lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
+    ylabel('$X_T\hspace{2mm}(m)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlim([0 max(timeVector)])
+    ylim([0 Xmax])
+    set(gca,'fontname','times new roman','fontsize',16)
+    hold on
+subplot1(2)
+    h = plot(timeVector,vx(indexVector),lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
+    ylabel('$v_T\hspace{2mm}(m/s)$','interpreter','latex','fontname','times new roman','fontsize',font) 
+    xlim([0 max(timeVector)])
+    set(gca,'yaxislocation','right');
+    set(gca,'fontname','times new roman','fontsize',16)
+    hold on
+subplot1(3)
+    h = plot(timeVector,psiWinchRad(indexVector)*rw,lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
+    %ylabel('Winch Pos (m)','fontsize',font)
+    ylabel('${\psi}r_W\hspace{2mm}(m)$','interpreter','latex','fontsize',font)
+    xlim([0 max(timeVector)])
+    set(gca,'fontname','times new roman','fontsize',16)
+    hold on
+subplot1(4)
+    h = plot(timeVector,psiWinchRadPS(indexVector)*rw,lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
+    %ylabel('Winch Speed (m/s)','fontsize',font) 
+    ylabel('$\dot{\psi}r_W\hspace{2mm}(m/s)$','interpreter','latex','fontsize',font)
+    xlim([0 max(timeVector)])
+    set(gca,'yaxislocation','right');
+    set(gca,'fontname','times new roman','fontsize',16)
+    hold on
+subplot1(5)
+    h = plot(timeVector,vXsled(indexVector),lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
+    xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlim([0 max(timeVector)])
+    ylabel('$v_{SD}\hspace{2mm}(m/s)$','interpreter','latex','fontname','times new roman','fontsize',font) 
+    set(gca,'fontname','times new roman','fontsize',16)
+    hold on
+subplot1(6)
+    h = plot(timeVector,DBP(indexVector)./1000,lineStyle);
+    set(h(1),'linewidth',lineWidthSize)
+    ylabel('$DB\hspace{2mm}(kN)$','interpreter','latex','fontname','calibri','fontsize',font) 
+    xlabel('$time\hspace{2mm}(seconds)$','interpreter','latex','fontname','times new roman','fontsize',font)
+    xlim([0 max(timeVector)])
+    set(gca,'yaxislocation','right');
+    set(gca,'fontname','times new roman','fontsize',16)
+    hold on    
+  
 
 
 %% Data Plots
@@ -439,9 +597,9 @@ if plotContour
 subplot1(5,2,'Gap',AX,'YTickL','All','Min',[0.05 0.07],'Max',[0.95 0.99],'FontS',font)
 end
 subplot1(1)
-    plot(timeVector,X(indexVector),lineStyle,timeVector,20*ones(numel(indexVector),1),':k',timeVector,35*ones(numel(indexVector),1),':k')
-   ylabel('$X_T\hspace{2mm}(m)$','interpreter','latex','fontname','calibri','fontsize',font)
-   ylim([10 60])
+    plot(timeVector,X(indexVector),lineStyle)
+    ylabel('$X_T\hspace{2mm}(m)$','interpreter','latex','fontname','calibri','fontsize',font)
+    ylim([0 Xmax])
     hold on
 subplot1(2)
     plot(timeVector,vx(indexVector),lineStyle)
@@ -461,11 +619,11 @@ subplot1(4)
     hold on
 subplot1(5)
     plot(timeVector,vXsled(indexVector),lineStyle)
-    ylabel('$v_S\hspace{2mm}(m/s)$','interpreter','latex','fontname','calibri','fontsize',font) 
+    ylabel('$v_{SD}\hspace{2mm}(m/s)$','interpreter','latex','fontname','calibri','fontsize',font) 
     hold on
 subplot1(6)
     plot(timeVector,DBP(indexVector)./1000,lineStyle)
-    ylabel('$T\hspace{2mm}(kN)$','interpreter','latex','fontname','calibri','fontsize',font) 
+    ylabel('$DB\hspace{2mm}(kN)$','interpreter','latex','fontname','calibri','fontsize',font) 
     set(gca,'yaxislocation','right');
     ylim([0 200])
     hold on
@@ -603,6 +761,22 @@ subplot1(4)
     %xlabel('time (seconds)','fontsize',font)
     hold on
 
-figure(10)
-    plot(timeVector,winchIsLocked(indexVector))
+% fontSize = 14;    
+% figure(10)
+% subplot(121)
+%     h = plot(timeVector,(RL+RR)./1000,'b');
+%     set(h(1),'linewidth',2)
+%     set(gca,'xlim',[0 simulationTime]);
+%     ylabel('total track resistance, $R_L + R_R$ (kN)','interpreter','latex','fontsize',fontSize)
+%     xlabel('time (seconds)','interpreter','latex','fontsize',fontSize)
+%     set(gca,'FontSize',fontSize,'FontName','Times New Roman')
+%     
+% subplot(122)
+%     h = plot(timeVector,sinkageLeftDynamic*100,'b');
+%     set(h(1),'linewidth',2)
+%     set(gca,'xlim',[0 simulationTime]);
+%     ylabel('dynamic track sinkage, $z_D$ (cm)','interpreter','latex','fontsize',fontSize)
+%     xlabel('time (seconds)','interpreter','latex','fontsize',fontSize)
+%     set(gca,'FontSize',fontSize,'FontName','Times New Roman')
+%     set(gca,'yaxislocation','right');
 end
